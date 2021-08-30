@@ -5,14 +5,14 @@
     <div class="input_box">
     <div class="titles">*标题</div>
     <el-input v-model="the_tile" placeholder="" style="width:60%;margin-right:20px"></el-input>
-    <el-select v-model="types" clearable style="width:120px" placeholder="请选择">
+    <!-- <el-select v-model="types" clearable style="width:120px" placeholder="请选择">
     <el-option
       v-for="item in options"
       :key="item.value"
       :label="item.label"
       :value="item.label">
     </el-option>
-  </el-select>
+  </el-select> -->
       </div>
     <div class="input_box">
     <div class="titles">*派往单位</div>
@@ -84,7 +84,7 @@
 </template>
 
 <script>
-import api from "@/api/apiList";
+import { create,maintenanceSubmit } from "@/api/modules/workOrder";
 export default {
 data() {
     return {
@@ -96,7 +96,7 @@ data() {
           value: '选项2',
           label: '其他'
         }],
-        types:'',//类别
+        // types:'',//类别
         the_tile:'',//标题
         company: '',//外派单位
         constructions:'',//施工单位
@@ -219,8 +219,9 @@ data() {
       //   console.log(res)
       //   }); 
       if(the_id==1){
-      let res = await this.$http.post(api.create,data);
-       console.log(res)
+        // console.log(the_id)
+      let res = await create(data);
+       console.log('保存草稿',res)
       if(res.status==200){
         this.$message({
                 message: '草稿保存成功',
@@ -235,7 +236,7 @@ data() {
               });
       }
       }else{
-       let res = await this.$http.post(api.maintenanceSubmit,data);
+       let res = await maintenanceSubmit(data);
        console.log(res)
        if(res.status==200){
         this.$message({

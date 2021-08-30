@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <div class="the_tile">待办工单</div>
+    <div class="the_tile">工单管理</div>
     <!-- 表格 -->
     <Pages :logs=data
     :table_data=data.tableData

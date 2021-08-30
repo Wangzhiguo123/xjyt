@@ -66,7 +66,7 @@ export default {
   font-size: 14px;
   line-height: 40px;
   &:hover {
-    color: red;
+    color: #3377ff;
   }
 }
 /dee/ .el-breadcrumb {

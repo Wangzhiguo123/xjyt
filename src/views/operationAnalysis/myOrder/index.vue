@@ -15,6 +15,7 @@
 
 <script>
 import Pages from "@/components/tables/paging.vue"
+import { processTransactionPage } from "@/api/modules/Myaffairs";
 export default {
   name: "Home",
   components: {
@@ -32,8 +33,8 @@ export default {
         the_level:'',
         data:{
           orderType:'My',//工单类别
-          'total':30,
-          'every_page':10,
+          total:'',
+          every_page:'',
           search:true,
           edits:true,
           submits:true,
@@ -68,21 +69,15 @@ export default {
           label: '标题2'
           }],
           table_list:[
-          {prop: "id", label: "序号"},
-          {prop: "number", label: "编号"},
-          {prop: "title", label: "标题"},
-          {prop: "types", label: "工单类型"},
-          {prop: "level", label: "工单等级"},
-          {prop: "originator", label: "发起人"},
-          {prop: "crateTime", label: "创建时间"},
-          { prop: "status", label: "状态"},
+          {prop: "xh_id", label: "序号"},
+          {prop: "processId", label: "事务Id"},
+          {prop: "processCode", label: "事务编码"},
+          {prop: "processTitle", label: "事务标题"},
+          {prop: "processType", label: "事务类型"},
+          {prop: "processRank", label: "事务等级"},
+          { prop: "statusId", label: "状态"},
           ],
-          tableData3:[
-          {id: "1",number:"XJ271822",title:"工单标题",types:"维修单",level:"非常重要",originator:"治国",crateTime:"2021-10-1",status:"1"},
-          {id: "1",number:"XJ271822",title:"工单标题",types:"维修单",level:"非常重要",originator:"治国",crateTime:"2021-10-1",status:"1"},
-          {id: "1",number:"XJ271822",title:"工单标题",types:"维修单",level:"非常重要",originator:"治国",crateTime:"2021-10-1",status:"1"},
-          {id: "1",number:"XJ271822",title:"工单标题",types:"维修单",level:"非常重要",originator:"治国",crateTime:"2021-10-1",status:"1"}
-          ],
+          tableData3:[]
         }
       };
     },
@@ -98,7 +93,25 @@ export default {
 
     },
   },
-  created(){
+ async created(){
+    let data ={
+      processId:'',
+      statusId:'',
+      page:'0',
+      sieze:'1'
+    }
+    try{
+    let thisData = await processTransactionPage(data)
+    console.log(thisData)
+    thisData.data.content.forEach((v,index) => {
+      v['xh_id']=index+1
+    })
+    this.data.tableData3=thisData.data.content
+    this.data.total=thisData.data.totalPages
+    this.data.every_page=thisData.data.size
+    }catch(error){
+      console.log("err",error)
+    }
   }
 };
 </script>

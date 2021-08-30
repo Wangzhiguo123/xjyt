@@ -1,4 +1,4 @@
-<!-- 地图自定义组件 -->
+<!-- 地图自定义组件 input选择搜索框及下来表格-->
 <!-- 参数说明
       type        -------------------------     类型 1下拉选搜索 2下拉选表格
       title       -------------------------     标题
@@ -15,10 +15,7 @@
         :placeholder="item.title"
         class="input-with-select"
       >
-        <el-select slot="prepend" v-model="select" :placeholder="item.subTitle">
-          <el-option label="餐厅名" value="1"></el-option>
-          <el-option label="订单号" value="2"></el-option>
-          <el-option label="用户电话" value="3"></el-option>
+        <el-select slot="prepend" disabled :placeholder="item.subTitle">
         </el-select>
         <el-button slot="append" icon="el-icon-search"></el-button>
       </el-input>
@@ -36,7 +33,7 @@
           <el-table
             :ref="item.indet"
             style="width: 100%"
-            :data="memberList"
+            :data="item.data"
             @row-click="handleRegionNodeClick"
             @cell-click="handleNameClick"
           >
@@ -49,14 +46,19 @@
               :width="item.width"
               sortable
             >
+              <template slot-scope="scope">
+                <span v-if="item.prop === 'addres'"> 定位 </span>
+                <span v-else-if="item.prop === 'index'"> {{index}} </span>
+                <span v-else>{{ scope.row[item.prop] }}</span>
+              </template>
             </el-table-column>
           </el-table>
         </div>
       </div>
       <div v-if="item.type === 3">
         <el-button style="margin-top: 20px" type="primary"
-          >{{ item.title }}({{ item.subTitle }})</el-button
-        >
+          >{{ item.title }}({{ item.subTitle }}) <span class="dot"></span
+        ></el-button>
       </div>
     </section>
   </div>
@@ -147,28 +149,28 @@ export default {
         {
           prop: "index",
           label: "序号",
-          width: "60",
+          width: "54",
         },
         {
-          prop: "obj",
+          prop: "unitId",
           label: "报警对象",
-          width: "90",
+          width: "84",
         },
         {
-          prop: "time",
+          prop: "alertDateTime",
           label: "报警时间",
-          width: "90",
+          width: "84",
         },
         {
           prop: "addres",
           label: "位置",
-          width: "60",
+          width: "54",
           scopedSlots: { customRender: "name" },
         },
         {
           prop: "status",
           label: "状态",
-          width: "60",
+          width: "54",
         },
       ],
     };
@@ -179,12 +181,12 @@ export default {
     },
     // 点击table节点
     handleRegionNodeClick(data) {
-      console.log("data", data);
+      this.$emit("seeInfo", data);
     },
-    handleNameClick() {
-      // row
-      let lng = 104.06;
-      let lat = 30.67;
+    handleNameClick(row) {
+      console.log('row',row)
+      let lng = row.latitude;
+      let lat = row.longitude;
       this.$emit("changePosition", lng, lat);
     },
   },
@@ -195,9 +197,30 @@ export default {
 .searchield {
   margin-left: 32px;
   margin-top: 188px;
-  width: 490px;
+  width: 424px;
   .inputTable {
     margin-top: 16px;
+  }
+  .treeDiv {
+    width: 80%;
+    height: auto;
+    overflow: auto;
+    overflow-x:hidden .el-table {
+      border-radius: 6px;
+    }
+    .el-table /deep/ td {
+      padding: 4px 0;
+    }
+  }
+  .dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border: 2px solid #fff;
+    background: #d9ecff;
+    border-radius: 50%;
+    transform: translateY(1px);
+    transform: translateX(12px);
   }
 }
 /deep/.el-select {
@@ -205,17 +228,7 @@ export default {
     width: 118px;
   }
 }
-.treeDiv {
-  width: 80%;
-  height: 226px;
-  overflow: auto;
-  overflow-x:hidden .el-table {
-    border-radius: 6px;
-  }
-  .el-table /deep/ td {
-    padding: 4px 0;
-  }
-}
+
 /deep/ .el-table th > .cell {
   padding-left: 0;
   padding-right: 0;

@@ -4,14 +4,17 @@ import { Message } from "element-ui";
 // 创建一个axios实例
 const axiosService = axios.create({
   baseURL: process.env.VUE_APP_BASE_API,
-  timeout: 5000, // 设置超时时间为5s
+  timeout: 15000, // 设置超时时间为5s
 });
-console.log('axios.create',axiosService.baseURL)
+console.log("axios.create", axiosService.baseURL);
 // request拦截器 ==> 对请求参数进行处理
 axiosService.interceptors.request.use(
   (config) => {
     // 可以在发送请求之前做些事情
     // 比如请求参数的处理、在headers中携带token等等
+    if (config.data && config.data.hasOwnProperty("headers")) {
+      config.headers = config.data.headers;
+    }
     const token = sessionStorage.getItem("access_token");
     if (token) {
       config.headers.Authorization = "Bearer " + token;
@@ -37,17 +40,26 @@ axiosService.interceptors.response.use(
   (response) => {
     const res = response;
     // 如果自定义的返回码不等于200, 就返回一个错误
-    if (res.status !== 200) {
-      return Promise.reject(new Error(res.message || "Error"));
-    } else {
+    if (res.status === 200 || res.status === 204) {
+      if (res.data.code) {
+        Message.closeAll();
+        Message({
+          showClose: true,
+          message: res.data.message,
+          type: "error",
+        });
+        return res;
+      }
       return res;
+    } else {
+      return Promise.reject(new Error(res.message || "Error"));
     }
   },
   (error) => {
     // 判断error的status代码，并将对应的信息告知用户
     let text = "";
     let err = JSON.parse(JSON.stringify(error));
-    if (err.response.status) {
+    if (err.response && err.response.status) {
       switch (error.response.status) {
         case 400:
           text = "请求错误(400)，请重新申请";
@@ -88,6 +100,8 @@ axiosService.interceptors.response.use(
     } else {
       text = "连接服务器失败,请退出重试!";
     }
+
+    Message.closeAll();
     Message({
       showClose: true,
       message: text,

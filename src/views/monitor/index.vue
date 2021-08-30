@@ -6,21 +6,18 @@
 
 <script>
 export default {
-  name: "Home",
+  name: "MonitorIndex",
   data() {
     return {};
   },
-  mounted() {
-    this.getFilmList();
-  },
-  methods: {
-    async getFilmList() {
-      console.log("this.$http.get", this.$http.get);
-      const url = "/film/getList";
-      const abc = "/film/getList";
-      const res = await this.$http.get(url, { abc });
-      console.log(res, "Ceshi");
-    },
-  },
+  mounted() {},
+  methods: {},
 };
 </script>
+<style lang="less" scoped>
+.monitor {
+  height: 100%;
+  min-width: 1160PX;
+  
+}
+</style>

@@ -1,6 +1,16 @@
+/*
+ * @Description:
+ * @Version: 2.0
+ * @Autor: hh
+ * @Date: 2021-08-18 10:25:24
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2021-08-27 10:05:47
+ */
 const path = require("path");
 const debug = process.env.NODE_ENV === "development";
-
+function resolve(dir) {
+  return path.join(__dirname, dir);
+}
 module.exports = {
   publicPath: process.env.VUE_APP_PUBLICPATH,
   productionSourceMap: false,
@@ -9,6 +19,20 @@ module.exports = {
   chainWebpack: (config) => {
     // 移除 prefetch 插件
     config.plugins.delete("prefetch");
+
+    // svg
+    config.module.rule("svg").exclude.add(resolve("src/icons")).end();
+    config.module
+      .rule("icons")
+      .test(/\.svg$/)
+      .include.add(resolve("src/icons"))
+      .end()
+      .use("svg-sprite-loader")
+      .loader("svg-sprite-loader")
+      .options({
+        symbolId: "icon-[name]",
+      })
+      .end();
   },
 
   configureWebpack: (config) => {
@@ -28,7 +52,7 @@ module.exports = {
       resolve: {
         extensions: [".js", ".json", ".vue"],
         alias: {
-          "@": path.resolve(__dirname, "./src"),
+          "@": resolve("src"),
           vue$: "vue/dist/vue.esm.js",
         },
       },
@@ -41,8 +65,13 @@ module.exports = {
     port: 8000,
     proxy: {
       "/api": {
-        target: "http://192.168.6.107:18089",
+        // target: "http://pss-knowledge.cddev.cddpi.com",
+        // target: "http://192.168.16.35:8088",
+        // target: "http://192.168.6.107:18092",
+        target:"http://192.168.6.107:18100/",
+        // target: "http://192.168.16.72:18092",
         // target: "http://192.168.7.5:18080",
+        // target: "http://192.168.16.56:18080",
         changeOrigin: true,
         ws: true,
         pathRewrite: {
@@ -51,4 +80,5 @@ module.exports = {
       },
     },
   },
+  lintOnSave: false,
 };

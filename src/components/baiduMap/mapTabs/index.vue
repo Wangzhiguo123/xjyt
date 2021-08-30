@@ -9,26 +9,25 @@
     <div class="tabsCrad">
       <ul>
         <li
-          :class="[activeTwo === index ? 'activePlantArea' : '']"
           v-for="(item, index) in plantArea[0].plantData"
           :key="index"
+          :class="[activeTwo === index ? 'activePlantArea' : '']"
         >
           {{ item.title }}
+          <div v-show="activeTwo === index" class="content">
+            <p class="triangle"></p>
+            <ul class="ulList">
+              <li
+                v-for="(item, index) in plantArea[1].addressData"
+                :key="index"
+                @click="selectLi"
+              >
+                {{ item.title }}
+              </li>
+            </ul>
+          </div>
         </li>
       </ul>
-      <div class="content">
-        <p class="triangle"></p>
-        <ul class="ulList">
-          <li
-            v-for="(item, index) in plantArea[1].addressData"
-            :key="index"
-            :class="active === 1 ? 'activeLi' : ''"
-            @click="selectLi"
-          >
-            {{ item.title }}
-          </li>
-        </ul>
-      </div>
     </div>
   </div>
 </template>
@@ -46,8 +45,8 @@ export default {
   data() {
     return {
       activeName: "first",
-      active: 1, //激活的列表
-      activeTwo: 2, //激活的列表
+      active: 0, //激活的列表
+      activeTwo: 0, //激活的列表
     };
   },
   mounted() {},
@@ -97,6 +96,7 @@ export default {
   }
   .content {
     position: absolute;
+    margin: 20px 0px 0 -100px;
     .triangle {
       width: 0;
       height: 0;

@@ -1,12 +1,9 @@
+<!-- 地图告警 -->
 <template>
   <div class="alarmMap">
-    <breadCrumbHead
-      :before-router-list="breadcrumb.beforeRouterList"
-      :locale-router="breadcrumb.localeRouter"
-    ></breadCrumbHead>
     <baidu-map class="map" :center="center" :zoom="zoom" @ready="handler">
       <bm-control class="tabs">
-          <mapTabs :plant-area="plantArea"></mapTabs>
+        <mapTabs :plant-area="plantArea"></mapTabs>
       </bm-control>
       <bm-control :offset="{ width: '100px', height: '10px' }">
         <bm-auto-complete v-model="keyword" :sug-style="{ zIndex: 1 }">
@@ -14,32 +11,45 @@
             :search-data="searchData"
             @isShow="showChange"
             @changePosition="changeAddress"
+            @seeInfo="proQueryByAlertIds"
           ></searchield>
         </bm-auto-complete>
       </bm-control>
       <bm-control class="alertInfo">
         <bm-auto-complete>
-          <alertInfo></alertInfo>
+          <alertInfo :info-data="infoData" :infoDataTit="infoDataTit"></alertInfo>
         </bm-auto-complete>
       </bm-control>
-    </baidu-map>
+      <bm-control class="dispatch">
+        <bm-auto-complete>
+          <dispatch></dispatch>
+        </bm-auto-complete>
+      </bm-control>
+      <!-- <bm-control class="repairOrder">
+        <bm-auto-complete>
+          <repairOrder></repairOrder>
+        </bm-auto-complete>
+      </bm-control>-->
+    </baidu-map> 
   </div>
 </template>
 
 <script>
 import api from "@/api/apiList";
-import breadCrumbHead from "@/components/breadCrumbHead";
 import searchield from "@/components/baiduMap/searchield";
 import mapTabs from "@/components/baiduMap/mapTabs";
 import alertInfo from "@/components/baiduMap/alertInfo";
+import dispatch from "@/components/baiduMap/dispatch";
+// import repairOrder from "@/components/baiduMap/repairOrder";
 
 export default {
   name: "AlarmMap",
   components: {
-    breadCrumbHead,
     searchield,
     mapTabs,
     alertInfo,
+    dispatch,
+    // repairOrder,
   },
   data() {
     return {
@@ -69,13 +79,7 @@ export default {
           subTitle: "",
           ident: "production",
           isShow: false,
-        },
-        {
-          type: 2,
-          title: "监控单元",
-          subTitle: "19",
-          ident: "monitoring",
-          isShow: false,
+          data:[]
         },
         { type: 3, title: "气井", subTitle: "10", ident: "three" },
         { type: 3, title: "集气站", subTitle: "8", ident: "three" },
@@ -110,6 +114,46 @@ export default {
           ],
         },
       ],
+      //报警基础信息
+      // infoData: [
+      //   { title: "[处理状态]", text: "待处理/处理中/已处理" },
+      //   { title: "[位置信息]", text: "新疆克拉玛依市百口泉" },
+      //   { title: "[告警区块]", text: "采气一厂" },
+      //   { title: "[关联对象]", text: "井DXHW179" },
+      //   { title: "[报警类型]", text: "参数报警/其他报警" },
+      //   { title: "[报警分类]", text: "高高报/高报/低报/低低报" },
+      //   { title: "[报警等级]", text: "普通/严重/特别严重" },
+      //   { title: "[参数名称]", text: "二级节流后温度" },
+      //   { title: "[实际/参考值]", text: "60°/30°" },
+      //   { title: "[报警时间]", text: "2021-07-06 18:28:31" },
+      //   { title: "[解决方案]", text: "二级节流文档过高处理方案" },
+      // ],
+      infoData: [
+        { title: "[处理状态]" },
+        { title: "[位置信息]" },
+        { title: "[告警区块]"},
+        { title: "[关联对象]"},
+        { title: "[报警类型]"},
+        { title: "[报警分类]"},
+        { title: "[报警等级]"},
+        { title: "[参数名称]"},
+        { title: "[实际/参考值]"},
+        { title: "[报警时间]"},
+        { title: "[解决方案]"},
+      ],
+      infoDataTit:[
+        {text: "待处理/处理中/已处理" },
+        {text: "新疆克拉玛依市百口泉" },
+        {text: "采气一厂" },
+        {text: "井DXHW179" },
+        {text: "参数报警/其他报警" },
+        {text: "高高报/高报/低报/低低报" },
+        {text: "普通/严重/特别严重" },
+        {text: "二级节流后温度" },
+        {text: "60°/30°" },
+        {text: "2021-07-06 18:28:31" },
+        {text: "二级节流文档过高处理方案" },
+      ],
       center: { lng: 0, lat: 0 },
       zoom: 3,
       keyword: "",
@@ -134,9 +178,20 @@ export default {
       this.center.lng = lng;
       this.center.lat = lat;
     },
+    //获取生产监控表格数据
     async getFilmList() {
-       let res = await this.$http.post(api.create);
-       console.log('res',res)
+      console.log('this.searchData[1]',this.searchData[1]);
+
+      let res = await this.$http.get(api.proMonitorAlertInfos);
+      this.searchData[1].data = res;
+      console.log("res", res);
+    },
+    //查询警报详情
+    async proQueryByAlertIds(data) {
+      console.log('proQueryByAlertIds',data)
+      let res = await this.$http.get(api.proQueryByAlertIds);
+      // this.infoData = res;
+      this.infoDataTit = res;
     },
     //地图参数
     handler({ BMap, map }) {
@@ -166,9 +221,9 @@ export default {
     width: 880px;
   }
 }
-.alertInfo{
- margin-left: 560px;
- margin-top: 140px;
+.alertInfo {
+  margin-left: 640px;
+  margin-top: 140px;
 }
 /deep/ .el-tabs__header {
   margin-bottom: 0;

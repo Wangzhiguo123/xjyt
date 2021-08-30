@@ -1,26 +1,35 @@
+<!--
+ * @Description: 
+ * @Autor: hh
+ * @Date: 2021-08-17 17:14:03
+ * @LastEditTime: 2021-08-25 12:03:24
+-->
 <template>
   <div id="app">
     <el-container>
-      <el-aside width="280px">
-        <el-menu router>
-          <div class="projectLogo">
-            <img src="./assets/logo.png" alt="" srcset="" />
-            <h1>生产调度指挥系统</h1>
-          </div>
-          <NavMenu :nav-menus="menuData"></NavMenu>
-        </el-menu>
+      <el-aside>
+        <side-bar />
       </el-aside>
-      <el-main><router-view /></el-main>
+      <el-main>
+        <bread-crumb-head locale-router="知识库管理"></bread-crumb-head>
+        <main class="main-container">
+          <div class="main-content">
+            <router-view />
+          </div>
+        </main>
+      </el-main>
     </el-container>
   </div>
 </template>
 <script>
-import NavMenu from "@/components/NavMenu";
+import SideBar from "@/components/Sidebar";
 
+import breadCrumbHead from "@/components/Breadcrumb";
 export default {
   name: "App",
   components: {
-    NavMenu,
+    SideBar,
+    breadCrumbHead,
   },
   data() {
     return {
@@ -29,36 +38,34 @@ export default {
   },
 };
 </script>
+
 <style lang="less" scoped>
 @import "./assets/reset.css";
 #app {
   width: 100%;
   height: 100%;
 }
-.projectLogo {
-  width: 100%;
-  background: #000;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  font-size: 22px;
-  color: #ffffff;
-  padding-top: 16px;
-  img {
-    width: 50px;
-    height: 50px;
-  }
-}
-/deep/.el-main {
-  padding: 0 !important;
+/deep/.el-container {
   height: 100%;
 }
-/deep/.el-menu {
-  background-color: #0a0b11;
-  border-right: none;
+/deep/.el-main {
+  width: calc(100vw - 400px);
+  height: 100%;
+  padding: 0 !important;
+  .main-container {
+    display: flex;
+    padding: 16px;
+    min-height: calc(100vh - 55px);
+    box-sizing: border-box;
+    background: #f0f2f5;
+    .main-content {
+      width: 100%;
+      min-height: calc(100vh - 87px);
+      background-color: #fff;
+    }
+  }
 }
-/deep/ .el-aside {
-  background-color: #0a0b11;
-  overflow: hidden;
-}
+</style>
+<style>
+@import "./assets/sidebar.less";
 </style>
