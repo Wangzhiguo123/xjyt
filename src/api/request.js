@@ -1,15 +1,21 @@
 import axios from "axios";
 
 import { Message } from "element-ui";
+
+import apiList from "./apiList";
 // 创建一个axios实例
 const axiosService = axios.create({
-  baseURL: process.env.VUE_APP_BASE_API,
   timeout: 15000, // 设置超时时间为5s
 });
-console.log("axios.create", axiosService.baseURL);
 // request拦截器 ==> 对请求参数进行处理
 axiosService.interceptors.request.use(
   (config) => {
+    let apiTarget = apiList.find((it) => config.url.indexOf(it.key) > -1);
+    // 移除代理字符串
+    let reg = new RegExp(apiTarget.key);
+    config.url = config.url.replace(reg, "");
+    config.baseURL = apiTarget.env;
+
     // 可以在发送请求之前做些事情
     // 比如请求参数的处理、在headers中携带token等等
     if (config.data && config.data.hasOwnProperty("headers")) {

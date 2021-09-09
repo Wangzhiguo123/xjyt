@@ -111,7 +111,7 @@ export default {
       };
       let res = await carColorPage(params);
       this.tableData = res.data.content || [];
-      this.pagination.totalCount = res.data.numberOfElements;
+      this.pagination.totalCount = Number(res.data.totalElements);
     }
   },
 };

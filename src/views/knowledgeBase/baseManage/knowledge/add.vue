@@ -1,25 +1,36 @@
 <!--
  * @Description: 新增知识库
  * @Date: 2021-08-24 09:10:27
- * @LastEditTime: 2021-08-30 09:57:54
+ * @LastEditTime: 2021-09-08 09:58:57
 -->
 <template>
   <div class="add-container">
-    <PageHeader title="新增">
+    <page-header :title="updateArticleId ? '编辑' : '新增'">
       <template slot="btns">
-        <el-button type="primary" size="mini" @click="handlePublish"
-          >发布</el-button
+        <el-button
+          size="mini"
+          :loading="saveBtnLoading"
+          @click="handleSave"
+          v-if="status !== '已发布'"
+          >保存</el-button
         >
         <el-button
+          v-if="updateArticleId"
           size="mini"
           :disabled="savedArticleIdList.length == 0"
           @click="handlePreview"
           >预览</el-button
         >
-        <el-button size="mini" @click="handleSave">保存草稿</el-button>
+        <el-button
+          type="primary"
+          :loading="btnLoading"
+          size="mini"
+          @click="handlePublish"
+          >发布</el-button
+        >
         <el-button size="mini" @click="$router.back()">返回</el-button>
       </template>
-    </PageHeader>
+    </page-header>
     <main class="main">
       <el-form
         label-width="80px"
@@ -245,6 +256,7 @@ import {
 } from "@/api/modules/knowledgeBase";
 
 import { formatSizeUnits, handleParam } from "@/utils";
+import { validateTitle } from "@/utils/validate";
 export default {
   name: "knowledgeAdd",
   components: {
@@ -261,13 +273,11 @@ export default {
   },
   data() {
     // 标题校验
-    const validateTitle = (rule, value, callback) => {
+    const validateArticleTitle = (rule, value, callback) => {
       if (!value) {
         return callback(new Error("请输入文章标题"));
       } else {
-        let regStr = /^[\u4E00-\u9FA5\w]{0,30}$/;
-        console.log(regStr.test(value));
-        if (regStr.test(value)) {
+        if (validateTitle(value)) {
           callback();
         } else {
           callback("文章标题不超过30字，不含特殊符号");
@@ -279,8 +289,7 @@ export default {
       if (!value) {
         return callback(new Error("请输入文章简介"));
       } else {
-        let regStr = /[\u4E00-\u9FA5\w]+/;
-        if (regStr.test(value)) {
+        if (validateTitle(value)) {
           callback();
         } else {
           callback("文章简介不能含特殊符号");
@@ -288,6 +297,12 @@ export default {
       }
     };
     return {
+      // 保存加载中
+      saveBtnLoading: false,
+      // 按钮加载中
+      btnLoading: false,
+      // 文章状态
+      status: "",
       // 表单参数
       formParams: {
         articleTitle: "",
@@ -307,7 +322,7 @@ export default {
             trigger: "blur",
           },
           {
-            validator: validateTitle,
+            validator: validateArticleTitle,
             trigger: "blur",
           },
         ],
@@ -334,20 +349,6 @@ export default {
             required: true,
             message: "请输入内容",
             trigger: "blur",
-          },
-        ],
-        articleAttachmentList: [
-          {
-            required: true,
-            message: "请选择附件",
-            trigger: "change",
-          },
-        ],
-        linkArticleIdList: [
-          {
-            required: true,
-            message: "请选择关联文章",
-            trigger: "change",
           },
         ],
       },
@@ -453,6 +454,8 @@ export default {
         }
         this.fileList = data.articleAttachmentList;
         this.linkArticleSelectedList = data.articleLinkList;
+
+        this.status = data.articleState_dictText;
       }
     },
     /**
@@ -556,6 +559,9 @@ export default {
      * @param {*}
      */
     async onLinkArticleSearch() {
+      if (this.$refs.linkArticleTable) {
+        this.$refs.linkArticleTable.clearSelection();
+      }
       this.linkArticleList = [];
       let formData = new FormData();
       handleParam(this.linkArticleParam, formData);
@@ -638,9 +644,15 @@ export default {
     handleSave() {
       this.$refs.formArticle.validate(async (valid) => {
         if (valid) {
-          let res = await this.handleInsertOrUpdate("direct");
-          if (res) {
-            this.$router.back();
+          this.saveBtnLoading = true;
+          try {
+            let res = await this.handleInsertOrUpdate("direct");
+            if (res) {
+              this.$router.back();
+            }
+            this.saveBtnLoading = false;
+          } catch (error) {
+            this.saveBtnLoading = false;
           }
         }
       });
@@ -703,29 +715,34 @@ export default {
     handlePublish() {
       this.$refs.formArticle.validate(async (valid) => {
         if (valid) {
+          this.btnLoading = true;
           // 当新增成功后 进行发布
-          let res = await this.handleInsertOrUpdate();
-          if (res) {
-            let formData = new FormData();
-            handleParam(
-              {
-                articleIdList: this.savedArticleIdList,
-                publishOrUnPublishType: 1,
-              },
-              formData
-            );
-            let { data } = await publishArticle(formData);
-            if (data.code === undefined) {
-              this.$message({
-                type: "success",
-                message: "发布成功",
-              });
-              setTimeout(() => {
-                this.$router.back();
-              }, 1500);
+          try {
+            let res = await this.handleInsertOrUpdate();
+            if (res) {
+              let formData = new FormData();
+              handleParam(
+                {
+                  articleIdList: this.savedArticleIdList[0],
+                  publishOrUnPublishType: 1,
+                },
+                formData
+              );
+              let { data } = await publishArticle(formData);
+              if (data.code === undefined) {
+                this.$message({
+                  type: "success",
+                  message: "发布成功",
+                });
+                setTimeout(() => {
+                  this.$router.back();
+                }, 1500);
+              }
             }
+            this.btnLoading = false;
+          } catch (error) {
+            this.btnLoading = false;
           }
-        } else {
         }
       });
     },

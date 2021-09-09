@@ -25,18 +25,13 @@ export const tbColumnCon = [
       width: 120,
     },
     {
-      title: "备注",
-      field: "remarks",
-      width: 120,
+      title: "服务开始时间",
+      field: "serviceStartTime",
+      width: 140,
     },
     {
       title: "服务到期时间",
       field: "serviceEndTime",
-      width: 140,
-    },
-    {
-      title: "服务开始时间",
-      field: "erviceStartTime",
       width: 140,
     },
     {
@@ -47,6 +42,11 @@ export const tbColumnCon = [
     {
       title: "车辆类型",
       field: "typeId",
+      width: 120,
+    },
+    {
+      title: "备注",
+      field: "remarks",
       width: 120,
     },
     {

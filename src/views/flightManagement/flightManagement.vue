@@ -18,7 +18,7 @@
 
 <script>
 import Pages from "@/components/tables/paging.vue"
-import { processTransactionPage,Create,Deletes,Updates } from "@/api/modules/workBench";
+import { processTransactionPage,Create,Deletes,Updates } from "@/api/modules/flight/flight";
 export default {
   name: "Home",
   components: {
@@ -36,8 +36,9 @@ export default {
         the_level:'',
         data:{
           orderType:'flight',//字典类别
-          total:'',
-          every_page:'',
+          total:null,
+          every_page:10,
+          the_page:1,
           search:true,
           edits:true,
           submits:true,
@@ -72,18 +73,19 @@ export default {
           label: '标题2'
           }],
           select:[
-            {title:'a',type:'a'},
-            {title:'b',type:'b'},
-            {title:'c',type:'a'},
+          {title:'name',type:'input'},
+          {title:'startTime',type:'time'},
+          {title:'endTime',type:'time'}
           ],
           newdata:{
-            a:'',
-            b:'',
-            c:''
+          name:'',
+          shiftId:'',
+          startTime:'',
+          endTime:'',
           },
           table_list:[
           {prop: "xh_id", label: "序号"},
-          {prop: "flightName", label: "班次名称"},
+          {prop: "name", label: "班次名称"},
           {prop: "startTime", label: "开始时间"},
           {prop: "endTime", label: "结束时间"},
           ],
@@ -94,7 +96,8 @@ export default {
   methods: {
     // 新增/删除/修改
     async d_action(type,newdata,index){
-      console.log(type)
+      // console.log(type,newdata)
+      // return
       if(type=='dictionary_add'){
         let datas = await Create(newdata)
         // console.log(datas)
@@ -103,7 +106,9 @@ export default {
           this.Tabular()
         }
       }if(type=='dictionary_del'){
-        let thisData = newdata[index].typeId
+        let thisData = newdata[index].shiftId
+        console.log(thisData)
+        // return
         try{
           await Deletes(thisData)
           // this.Tabular()
@@ -131,22 +136,24 @@ export default {
     },
     async Tabular() {
       let data ={
-      typeId:'',
-      name:'',
-      parentId:'',
-      statusId:'',
-      page:'0',
-      size:'20'
+      // typeId:'',
+      // name:'',
+      // parentId:'',
+      // statusId:'',
+      page:0,
+      size:10
     }
     try{
     let thisData = await processTransactionPage(data)
-    // console.log(thisData.data.content)
+    // console.log(thisData)
     thisData.data.content.forEach((v,index) => {
       v['xh_id']=index+1
     })
     this.data.tableData3=thisData.data.content
     this.data.total=thisData.data.totalPages
     this.data.every_page=thisData.data.size
+    this.data.the_page=thisData.data.number+1
+    console.log(this.data.the_page)
     }catch(err){
       console.log(err)
     }

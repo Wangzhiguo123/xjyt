@@ -1,7 +1,7 @@
 <!--
  * @Description: 面包屑
  * @Date: 2021-08-24 14:48:03
- * @LastEditTime: 2021-08-24 16:27:45
+ * @LastEditTime: 2021-09-03 16:45:16
 -->
 <template>
   <el-breadcrumb class="app-breadcrumb" separator="/">
@@ -94,10 +94,15 @@ export default {
   color: rgba(0, 0, 0, 0.45);
 }
 .app-breadcrumb.el-breadcrumb {
-  display: inline-block;
+  position: sticky;
+  top: 0;
+  display: block;
   font-size: 14px;
   line-height: 50px;
-  margin-left: 8px;
+  padding-left: 8px;
+  background-color: #fff;
+  z-index: 10;
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.05);
 
   .no-redirect {
     color: rgba(0, 0, 0, 0.85);

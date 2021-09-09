@@ -3,7 +3,7 @@
  * @Autor: hh
  * @Date: 2021-08-19 15:04:39
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-08-27 18:00:00
+ * @LastEditTime: 2021-09-08 11:06:32
 -->
 <template>
   <div class="knowledge">
@@ -18,6 +18,7 @@
             placeholder="请选择"
             clearable
             multiple
+            :multiple-limit="3"
             collapse-tags
           >
             <el-option
@@ -36,6 +37,7 @@
             clearable
             multiple
             collapse-tags
+            :multiple-limit="1"
           >
             <el-option
               v-for="item in classifyList"
@@ -52,6 +54,7 @@
             placeholder="请选择"
             clearable
             multiple
+            :multiple-limit="1"
             collapse-tags
           >
             <el-option
@@ -59,6 +62,21 @@
               :key="item.authorId"
               :label="item.authorName"
               :value="item.authorId"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-select
+            size="mini"
+            clearable
+            v-model="formParams.articleState"
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in statusList"
+              :key="item.key"
+              :label="item.label"
+              :value="item.key"
             ></el-option>
           </el-select>
         </el-form-item>
@@ -82,7 +100,7 @@
             size="mini"
             v-model="formParams.title"
             clearable
-            placeholder="审批人"
+            placeholder="标题"
           ></el-input>
         </el-form-item>
 
@@ -92,7 +110,7 @@
           >
         </el-form-item>
         <el-form-item>
-          <el-button size="mini" type="primary" plain @click="onReset"
+          <el-button size="mini" type="primary" plain @click="handleReset"
             >重置</el-button
           >
         </el-form-item>
@@ -110,8 +128,19 @@
         :cell-style="setCellStyle"
         @query-data="getKnowledgeBaseList"
         @sort-change="sortChange"
-        @row-click="handleRowClick"
       >
+        <el-table-column
+          slot="column0"
+          slot-scope="row"
+          :label="row.title"
+          :width="row.width"
+        >
+          <template slot-scope="scoped">
+            <span class="column-title" @click="handleRowClick(scoped.row)">{{
+              scoped.row.articleTitle
+            }}</span>
+          </template>
+        </el-table-column>
         <el-table-column
           slot="column1"
           slot-scope="row"
@@ -120,7 +149,9 @@
         >
           <template slot-scope="scope">
             <span>{{
-              scope.row.articleLabelList.map((it) => it.labelName).join()
+              scope.row.articleClassificationList
+                .map((it) => it.classificationName)
+                .join()
             }}</span>
           </template>
         </el-table-column>
@@ -132,9 +163,7 @@
         >
           <template slot-scope="scope">
             <span>{{
-              scope.row.articleClassificationList
-                .map((it) => it.classificationName)
-                .join()
+              scope.row.articleLabelList.map((it) => it.labelName).join()
             }}</span>
           </template>
         </el-table-column>
@@ -157,10 +186,10 @@
           sortable="custom"
           :label="row.title"
           :width="row.width"
-          prop="creationDate"
+          prop="articlePublishDateTime"
         >
           <template slot-scope="scope">
-            <span>{{ scope.row.creationDate }}</span>
+            <span>{{ scope.row.articlePublishDateTime }}</span>
           </template>
         </el-table-column>
 
@@ -181,25 +210,26 @@
           :label="row.title"
           :width="row.width"
         >
-          <template slot-scope="scope">
+          <template slot-scope="scoped">
             <el-button
               size="mini"
               type="text"
-              @click.stop="handleEdit(scope.row)"
+              v-if="scoped.row.articleState !== 'P02'"
+              @click.stop="handleEdit(scoped.row)"
               >编辑</el-button
             >
             <el-button
               size="mini"
               type="text"
-              @click.stop="handleDelete(scope.row)"
+              @click.stop="handleDelete(scoped.row)"
               >删除</el-button
             >
             <el-button
               size="mini"
               type="text"
-              @click.stop="handleDownUp(scope.row)"
+              @click.stop="handleDownUp(scoped.row)"
               >{{
-                scope.row.articleState_dictText === "未发布" ? "上" : "下"
+                scoped.row.articleState === "P02" ? "下" : "上"
               }}架</el-button
             >
           </template>
@@ -240,8 +270,9 @@ export default {
 
       // 筛选条件参数
       formParams: {
-        sortFlag: "",
-        sortKey: "",
+        articleState: "",
+        fieldName: "",
+        sortType: "",
         labelIdList: [],
         classificationIdList: [],
         authorIdList: [],
@@ -250,6 +281,20 @@ export default {
         title: "",
       },
       formDate: [],
+      statusList: [
+        {
+          key: "P01",
+          label: "未发布",
+        },
+        {
+          key: "P02",
+          label: "已发布",
+        },
+        {
+          key: "P03",
+          label: "已下架",
+        },
+      ],
       loading: false,
       // 表格数据
       tableData: [],
@@ -259,12 +304,12 @@ export default {
           field: "articleTitle",
         },
         {
-          title: "标签",
-          field: "articleLabelList",
+          title: "所属类别",
+          field: "articleClassificationList",
         },
         {
-          title: "所属类型",
-          field: "articleClassificationList",
+          title: "标签",
+          field: "articleLabelList",
         },
         {
           title: "大小",
@@ -272,7 +317,7 @@ export default {
         },
         {
           title: "发布时间",
-          field: "creationDate",
+          field: "articlePublishDateTime",
           width: 150,
         },
         {
@@ -341,17 +386,22 @@ export default {
      * @param {*}
      */
     onDateChange(val) {
-      [this.formParams.publishDateStart, this.formParams.publishDateEnd] = [
-        ...val,
-      ];
+      if (val === null) {
+        this.formParams.publishDateStart = "";
+        this.formParams.publishDateEnd = "";
+      } else {
+        [this.formParams.publishDateStart, this.formParams.publishDateEnd] = [
+          ...val,
+        ];
+      }
     },
     /**
      * @description: 排序改变
      * @param {*}
      */
     sortChange(res) {
-      this.formParams.sortFlag = res.order === "ascending" ? "ASC" : "DESC";
-      this.formParams.sortKey = res.prop;
+      this.formParams.sortType = res.order === "ascending" ? "ASC" : "DESC";
+      this.formParams.fieldName = res.prop;
 
       this.getKnowledgeBaseList();
     },
@@ -369,7 +419,9 @@ export default {
      * @param {*}
      */
     setCellStyle({ columnIndex, row }) {
-      if (columnIndex === 6 && row.articleState_dictText == "未发布") {
+      if (columnIndex === 0) {
+        return "color:#409EFF;";
+      } else if (columnIndex === 6 && row.articleState_dictText == "未发布") {
         return "color:#EB4F1A;";
       }
     },
@@ -377,11 +429,12 @@ export default {
      * @description: 重置参数
      * @param {*}
      */
-    onReset() {
+    handleReset() {
       this.formDate = [];
       this.formParams = {
-        sortFlag: "",
-        sortKey: "",
+        articleState: "",
+        fieldName: "",
+        sortType: "",
         labelIdList: "",
         classificationIdList: "",
         authorIdList: "",
@@ -444,7 +497,7 @@ export default {
         },
         param
       );
-      if (row.articleState_dictText === "未发布") {
+      if (row.articleState !== "P02") {
         param.append("publishOrUnPublishType", 1);
         let { data } = await publishArticle(param);
         if (data.code === undefined) {
@@ -509,5 +562,9 @@ export default {
   .content {
     padding: 20px 40px;
   }
+}
+.column-title {
+  white-space: nowrap;
+  cursor: pointer;
 }
 </style>

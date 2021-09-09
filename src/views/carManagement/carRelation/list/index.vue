@@ -1,6 +1,6 @@
 <!-- 生产监控车辆管理-车辆类型 -->
 <template>
-  <div class="carTypes">
+  <div class="carRelation">
        <el-form :model="formInline" class="form">
                 <el-row> <el-col :span="4">
                          <el-form-item label="车辆类型">
@@ -42,11 +42,11 @@
 <script>
 import tableCom from "@/components/tableCom"; 
 import delModal from "@/components/delModal";
-import { carTypesPage,carTypesDel } from "@/api/modules/carManagement";
+import { carOrganizeCompanysPage,carOrganizeCompanysDel } from "@/api/modules/carManagement";
 import addOrEdit from "../addOrEdit";
 import { tbColumnCon } from "./config";
 export default {
-  name: "carTypes",
+  name: "carRelation",
   components: {
     tableCom,
     addOrEdit,
@@ -93,7 +93,7 @@ export default {
     //确认删除
     async delConfirm (data) {
       console.log('res',data)
-      let res = await carTypesDel(data);
+      let res = await carOrganizeCompanysDel(data);
       console.log('res',res)
       if (res.status === 204) {
         this.queryList();
@@ -109,7 +109,7 @@ export default {
         size: this.pagination.size,
         tenantId:0
       };
-      let res = await carTypesPage(params);
+      let res = await carOrganizeCompanysPage(params);
       this.tableData = res.data.content || [];
       this.pagination.totalCount = res.data.numberOfElements;
     }
@@ -118,7 +118,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.carTypes {
+.carRelation {
   min-width: calc(100vh - 300px);
   min-width: 1440px;
   padding-left: 30px;

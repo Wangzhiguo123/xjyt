@@ -22,7 +22,7 @@
                   :columnCheck="true"
                   :show-pagination="true"
                   @query-data="queryList">
-                  <el-table-column slot="column3"
+                  <el-table-column slot="column4"
                                   slot-scope="row"
                                   :label="row.title"
                                   :width="row.width"
@@ -111,7 +111,7 @@ export default {
       };
       let res = await carOrganizesPage(params);
       this.tableData = res.data.content || [];
-      this.pagination.totalCount = res.data.numberOfElements;
+      this.pagination.totalCount = Number(res.data.totalElements);
     }
   },
 };

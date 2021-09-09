@@ -1,7 +1,7 @@
 /*
  * @Description: 工具类
  * @Date: 2021-08-25 15:42:02
- * @LastEditTime: 2021-08-27 15:10:25
+ * @LastEditTime: 2021-09-01 17:46:45
  */
 export function formatSizeUnits(bytes) {
   if (bytes === 0) return "0 B";
@@ -47,4 +47,36 @@ export function getQueryString() {
     obj[pair[0]] = pair[1];
   }
   return obj;
+}
+
+/**
+ * @description: 下载文件
+ * @param {*}
+ */
+export function downloadFile(response) {
+  const disposition = response.headers["content-disposition"];
+  let fileName = disposition.substring(
+    disposition.indexOf("filename=") + 9,
+    disposition.length
+  );
+  fileName = decodeURI(escape(fileName));
+  // 去掉双引号
+  fileName = fileName.replace(/\"/g, "");
+  const content = response.data;
+  // 创建a标签并点击， 即触发下载
+  let url = window.URL.createObjectURL(
+    new Blob([content], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8",
+    })
+  );
+  let link = document.createElement("a");
+  link.style.display = "none";
+  link.href = url;
+  link.setAttribute("download", fileName);
+  // 模拟
+  document.body.appendChild(link);
+  link.click();
+  // 释放URL 对象
+  window.URL.revokeObjectURL(link.href);
+  document.body.removeChild(link);
 }

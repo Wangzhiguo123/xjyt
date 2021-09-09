@@ -1,7 +1,7 @@
 <!--
  * @Description: 搜索结果页
  * @Date: 2021-08-24 17:01:05
- * @LastEditTime: 2021-08-27 16:30:13
+ * @LastEditTime: 2021-09-08 09:12:53
 -->
 <template>
   <div class="res-container">
@@ -103,7 +103,7 @@ export default {
     async getAllClassifyList() {
       let { data } = await getAllClassifyList();
       if (data.code === undefined) {
-        this.classifyList = data.slice(0, 14);
+        this.classifyList = data;
       }
     },
     /**
@@ -150,6 +150,13 @@ export default {
         size: 10,
       });
       if (data.cdoe === undefined) {
+        if (!data.content.length) {
+          this.$message.closeAll();
+          this.$message({
+            type: "info",
+            message: "暂无搜索结果",
+          });
+        }
         this.totalPages = data.totalPages;
         this.searchList = [...this.searchList, ...data.content];
       }

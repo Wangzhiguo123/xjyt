@@ -12,7 +12,7 @@
       class="title"
       v-html="result.articleTitle"
     ></router-link>
-    <section class="content" v-html="content"></section>
+    <section class="content" v-html="result.articleContent"></section>
     <footer class="foot">
       <span class="item">作者：{{ result.createdByName }}</span>
       <span class="item"

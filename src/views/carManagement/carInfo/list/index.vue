@@ -1,4 +1,4 @@
-<!-- 生产监控报警管理-参数报警 -->
+<!-- 车辆管理-车辆信息 -->
 <template>
   <div class="productionWarning">
        <el-form :model="formInline" class="form">
@@ -28,7 +28,20 @@
                                           <el-option label="区域二" value="beijing"></el-option></el-select></el-form-item></el-col>
                         <el-col :span="4">
                           <el-button type="primary" @click="queryList">搜索</el-button>
-                          <el-button @click="onSubmit">导出</el-button></el-col></el-row></el-form>
+                          <el-button type="primary" @click="queryList">重置</el-button></el-col></el-row>
+                <el-row>  <el-col :span="2">
+                          <el-button type="primary" @click="queryList">新增</el-button></el-col>
+               <el-col :span="2">
+                           <el-upload class="upload-demo"
+                                      :action="carsImport"
+                                      :on-preview="handlePreview"
+                                      :on-success="handleAvatarSuccess"
+                                       multiple
+                                      :limit="3"
+                                      :on-exceed="handleExceed"
+                                      :file-list="fileList">
+                                      <el-button size="small" type="primary">导入</el-button></el-upload>
+                                      </el-col> </el-row></el-form>
         <tableCom :table-data="tableData"
                   :column-data="tbColumnCon"
                   style="width: 80%"
@@ -47,9 +60,11 @@
                                   sortable>
                   <template slot-scope="scoped">
                     <div class="operation">
-                      <p @click="openhandle(scoped.row)">报警类型</p>
+                      <!-- <p @click="openhandle(scoped.row)">报警类型</p>
                       <p>派遣工单</p>
-                      <p>监控画面</p>
+                      <p>监控画面</p> -->
+                      <p>编辑</p>
+                      <!-- <p>查看</p> -->
                     </div></template></el-table-column></tableCom>
       <!-- <handle-modal ref="handleModal" @confirm="confirm"></handle-modal>
       <relation-modal></relation-modal> -->
@@ -59,7 +74,9 @@
 <script>
 import tableCom from "@/components/tableCom";
 import moment from "moment";
-import { productionAlerts,handleResults } from "@/api/modules/carManagement";
+import { carInfoPage } from "@/api/modules/carManagement";
+import importFile from "@/api/modules/importFile";
+// import { productionAlerts,handleResults } from "@/api/modules/carManagement";
 // import handleModal from "../../../components/handleModal.vue";
 // import relationModal from "../../../components/relationModal.vue";
 import { tbColumnCon } from "./config";
@@ -79,6 +96,8 @@ export default {
         type: "",
         status: "",
       },
+      fileList: [],//上传文件
+      carsImport: importFile.carsImport,
       //表头数据
       tbColumnCon,
       //表格数据
@@ -91,7 +110,6 @@ export default {
       },
     };
   },
-  created() {},
   mounted() {
     this.queryList();
   },
@@ -107,30 +125,47 @@ export default {
       this.$refs.handleModal.show(data);
     },
     //告警处理
-    async confirm (data) {
-       let res = await handleResults(data);
-    },
+    // async confirm (data) {
+    //    let res = await handleResults(data);
+    // },
+    //点击文件列表中已上传的文件时的钩子
+      handlePreview(file) {
+        console.log(file);
+      },
+    //点击文件列表中已上传的文件时的钩子
+      handleExceed(file) {
+        console.log(file);
+      },
+    //点击文件列表中已上传的文件时的成功钩子
+      handleAvatarSuccess(res, file) {
+        // res.errorList 失败的条数
+        console.log('this.tableData',res.errorList)
+        // this.tableData = res.errorList;
+      },
     //查询列表
     async queryList() {
       let params = {
-        ...this.formInline,
+        // ...this.formInline,
         current: this.pagination.current - 1,
         size: this.pagination.size,
+        carPageDTO:{}
       };
-      if (params.alterTime) {
-        params.alertStartTime = moment(params.alterTime[0]).format(
-          "YYYY-MM-DD HH:mm:ss"
-        );
-        params.alertEndTime = moment(params.alterTime[1]).format(
-          "YYYY-MM-DD HH:mm:ss"
-        );
-      } else {
-        params.alertStartTime = "";
-        params.alertEndTime = "";
-      }
-      let res = await productionAlerts(params);
+      // if (params.alterTime) {
+      //   params.alertStartTime = moment(params.alterTime[0]).format(
+      //     "YYYY-MM-DD HH:mm:ss"
+      //   );
+      //   params.alertEndTime = moment(params.alterTime[1]).format(
+      //     "YYYY-MM-DD HH:mm:ss"
+      //   );
+      // } else {
+      //   params.alertStartTime = "";
+      //   params.alertEndTime = "";
+      // }
+      console.log('params',params)
+      let res = await carInfoPage(params);
+      console.log('res',res)
       this.tableData = res.data.content || [];
-      this.pagination.totalCount = res.data.totalPages;
+      this.pagination.totalCount = Number(res.data.totalElements);
     }
 
   },
@@ -151,6 +186,13 @@ export default {
     p{
       margin-right: 10px;
     }
+  }
+}
+/deep/ .upload-demo{
+  .el-button--primary{
+    width: 66px;
+    height: 40px;
+    margin-left: -20px;
   }
 }
 </style>

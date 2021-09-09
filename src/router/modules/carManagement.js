@@ -29,6 +29,15 @@ export default [
         component: () => import("@/views/carManagement/carInfo/list"),
       },
       {
+        path: "/driverInfo",
+        name: "driverInfo",
+        meta: {
+          menuName: "驾驶员信息",
+          isMenu: true, 
+        },
+        component: () => import("@/views/carManagement/driverInfo/list"),
+      },
+      {
         path: "/carType",
         name: "carType",
         meta: {

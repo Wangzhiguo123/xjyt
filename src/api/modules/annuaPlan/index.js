@@ -2,7 +2,8 @@
 // import request from "../../index";
 import * as request from "@/api/index";
 // const url ="http://192.168.6.107:18089"
-const url ="v1"
+// const url =""
+const url ="/annuaPlan/v1"
 // 年度计划列表初始化
 export function processTransactionPage(query){
   return request.get(`${url}/annualSampling/annualSampling/page`,query)
@@ -21,5 +22,5 @@ export function Create(data){
   }
 // 年度计划列表(删除)
 export function Deletes(data){
-    return request.deletefn(`${url}/annualSampling/annualSampling/delete/`+data)
+    return request.deletefn(`${url}/annualSampling/annualSampling/`+data)
   }

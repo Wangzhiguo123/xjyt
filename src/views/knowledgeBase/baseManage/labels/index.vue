@@ -3,7 +3,7 @@
  * @Autor: hh
  * @Date: 2021-08-19 15:04:39
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-08-30 10:01:47
+ * @LastEditTime: 2021-09-07 14:36:22
 -->
 <template>
   <div class="labels">
@@ -42,6 +42,8 @@
 
       <v-table
         style="margin-top: 15px"
+        _ref="table"
+        ref="table"
         :loading="loading"
         :table-data="tableData"
         :column-data="columnData"
@@ -168,11 +170,11 @@ export default {
      * @return {*}
      */
     handleAdd() {
-      this.$prompt("请输入标签名称", "提示", {
+      this.$prompt("请输入标签名称", "添加", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        inputPattern: /^[\u4e00-\u9fa5\w]{0,10}$/,
-        inputErrorMessage: "标签不能包含特殊字符，10字以内",
+        inputPattern: /^[\u4e00-\u9fa5\da-zA-Z]{1,10}$/,
+        inputErrorMessage: "请输入标签内容且不能包含特殊字符",
       })
         .then(async ({ value }) => {
           let { data } = await addLabel({
@@ -209,6 +211,7 @@ export default {
         page: 1,
         size: 10,
       };
+      this.labelIds = [];
     },
     /**
      * @description: 获取标签列表数据
@@ -283,13 +286,14 @@ export default {
           };
           let { data } = await delLables(param);
           if (data.code !== "500") {
-            this.restParam();
-            this.getLableList();
             this.$message({
               type: "success",
               message: "删除成功!",
             });
           }
+          this.restParam();
+          this.getLableList();
+          this.$refs.table.clearSelection();
         })
         .catch(() => {});
     },

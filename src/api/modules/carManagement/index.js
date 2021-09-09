@@ -2,14 +2,13 @@
  * @Description: 车辆管理
  */
 import * as request from "@/api/index";
-const carUrl = "v1";
+const carUrl = "/vehicle/v1"; 
 /********************************车辆信息******************************************/
 //列表
 export function carInfoPage(query){
-    return request.get(`${carUrl}/${query.organizationId}/cars/page`)
+    return request.post(`${carUrl}/cars/page?current=${query.current}&size=${query.size}`,query)
   }
 //新增
-organizationId 
 export function carInfoAdd(query){
     return request.post(`${carUrl}/${query.organizationId}/cars/insert`,query)
   }
@@ -20,6 +19,10 @@ export function carInfoEdit(query){
 //删除
 export function carInfoDel(query){
     return request.deletefn(`${carUrl}/${query.organizationId}/cars/${query.id}`)
+  }
+//导入
+export function carsImport(query){
+    return request.post(`${carUrl}/cars/import`)
   }
 /********************************车辆类型******************************************/
 //列表
@@ -105,4 +108,38 @@ export function carOperationStatussEdit(query){
 //删除
 export function carOperationStatussDel(query){
     return request.deletefn(`${carUrl}/carOperationStatuss/${query.id}`)
+  }
+/********************************驾驶员信息******************************************/
+//列表  
+export function carDriversPage(query){
+    return request.get(`${carUrl}/carDrivers/page`,query)
+  }
+//新增
+export function carDriversAdd(query){
+    return request.post(`${carUrl}/carDrivers`,query)
+  }
+//修改
+export function carDriversEdit(query){
+    return request.put(`${carUrl}/carDrivers`,query)
+  }
+//删除
+export function carDriversDel(query){
+    return request.deletefn(`${carUrl}/carDrivers/${query.id}`)
+  }
+/********************************车辆组织与管理组织关联******************************************/
+//列表
+export function carOrganizeCompanysPage(query){
+    return request.get(`${carUrl}/carOrganizeCompanys/page`,query)
+  }
+//新增
+export function carOrganizeCompanysAdd(query){
+    return request.post(`${carUrl}/carOrganizeCompanys`,query)
+  }
+//修改
+export function carOrganizeCompanysEdit(query){
+    return request.put(`${carUrl}/carOrganizeCompanys`,query)
+  }
+//删除
+export function carOrganizeCompanysDel(query){
+    return request.deletefn(`${carUrl}/carOrganizeCompanys/${query.id}`)
   }

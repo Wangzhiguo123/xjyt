@@ -12,13 +12,14 @@
     @every_page="every_page"
     @the_page="the_page"
     @actions="d_action"
+    @Uploads="uploads"
     />
   </div>
 </template>
 
 <script>
 import Pages from "@/components/tables/paging.vue"
-import { processTransactionPage,Create,Deletes,Updates } from "@/api/modules/workBench";
+import { processTransactionPage,Create,Deletes,Updates,listTemplate,uploadFiles } from "@/api/modules/workBench";
 export default {
   name: "Home",
   components: {
@@ -36,8 +37,9 @@ export default {
         the_level:'',
         data:{
           orderType:'workBench',//字典类别
-          total:'',
-          every_page:'',
+          total:0,
+          every_page:1,
+          the_page:1,
           search:true,
           edits:true,
           submits:true,
@@ -89,7 +91,6 @@ export default {
       console.log(type)
       if(type=='dictionary_add'){
         let datas = await Create(newdata)
-        // console.log(datas)
         if(datas){
           this.$refs.Pages.the_actions('add')
           this.Tabular()
@@ -98,7 +99,6 @@ export default {
         let thisData = newdata[index].typeId
         try{
           await Deletes(thisData)
-          // this.Tabular()
           this.$refs.Pages.the_actions('del',newdata,index)
         }catch(err){
           console.log("err", err);
@@ -108,7 +108,6 @@ export default {
           await Updates(newdata)
           this.$refs.Pages.the_actions('add')
           this.Tabular()
-          // this.$refs.Pages.the_actions('del',newdata,index)
         }catch(err){
           console.log("err", err);
         }
@@ -127,7 +126,7 @@ export default {
       name:'',
       parentId:'',
       statusId:'',
-      page:'0',
+      page:0,
       size:'20'
     }
     try{
@@ -136,6 +135,7 @@ export default {
     thisData.data.content.forEach((v,index) => {
       v['xh_id']=index+1
     })
+    // console.log(thisData.data)
     this.data.tableData3=thisData.data.content
     this.data.total=thisData.data.totalPages
     this.data.every_page=thisData.data.size
@@ -143,9 +143,30 @@ export default {
       console.log(err)
     }
     },
+    async uploads(data) {
+      console.log(data)
+      // return
+    try{
+      console.log(123)
+    let files = await uploadFiles(data)
+    console.log(files)
+    }catch(err){
+      console.log(err)
+    }
+    },
+
+    async listTemplate() {
+    try{
+    let listdata = await listTemplate()
+    console.log(listdata.data)
+    }catch(err){
+      console.log(err)
+    }
+    },
   },
   created(){
    this.Tabular()
+   this.listTemplate()
   }
 };
 </script>

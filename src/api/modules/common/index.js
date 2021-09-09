@@ -1,13 +1,18 @@
 /*
- * @Description: 
+ * @Description:
  * @Version: 2.0
  * @Autor: hh
  * @Date: 2021-08-18 10:25:24
- * @LastEditTime: 2021-08-18 10:33:36
+ * @LastEditTime: 2021-09-07 14:46:47
  */
-// const url = "192.000.1234";
-import request from "../../index";
+import * as request from "@/api/index";
+const base1 = "/passsystem";
 
-export function dcRepair(query) {
-  return request.get("/dcRepair/dcRepair/create", query);
+// 获取字典数据
+export function getDicList(query) {
+  return request.get(`${base1}/v1/sysdictionary/dicByTypeCode`, query);
+}
+// 文件上传
+export function uploadFile(param) {
+  return request.post(`${base1}/v1/file/uploadFile`, param);
 }

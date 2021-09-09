@@ -81,7 +81,7 @@ export default [
             path: "/productionWarning/processingStatus",
             name: "processingStatus",
             meta: {
-              menuName: "状态处理",
+              menuName: "处理方式",
               isMenu: true,
             },
             component: () => import("@/views/monitor/productionWarning/processingStatus"),
@@ -135,6 +135,16 @@ export default [
             },
             component: () =>
               import("@/views/monitor/runningVehicle/basicsInfo/list"),
+          },
+          {
+            path: "/runningVehicle/processingType",
+            name: "processingType",
+            meta: {  
+              menuName: "处理方式",
+              isMenu: true,
+            },
+            component: () =>
+              import("@/views/monitor/runningVehicle/processingType/list"),
           },
         ]
       },

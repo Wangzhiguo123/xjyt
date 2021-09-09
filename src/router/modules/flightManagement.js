@@ -35,7 +35,7 @@
             menuName: "班组管理",
             isMenu: true, 
           },
-          component: () => import("@/views/flightManagement/teamManagement"),
+          component: () => import("@/views/flightManagement/teamManagement/index"),
         },
       ],
     },

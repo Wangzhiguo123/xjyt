@@ -1,23 +1,33 @@
 <!--
  * @Description: 新增知识库
  * @Date: 2021-08-24 09:10:27
- * @LastEditTime: 2021-08-30 14:17:22
+ * @LastEditTime: 2021-09-08 09:59:16
 -->
 <template>
   <div class="add-container">
     <PageHeader title="新增">
       <template slot="btns">
-        <el-button type="primary" size="mini" @click="handlePublish"
-          >发布</el-button
+        <el-button
+          size="mini"
+          :loading="saveBtnLoading"
+          @click="handleSave"
+          v-if="status !== '已发布'"
+          >保存</el-button
         >
         <el-button
+          v-if="updateArticleId"
           size="mini"
           :disabled="savedArticleIdList.length == 0"
           @click="handlePreview"
           >预览</el-button
         >
-        <el-button size="mini" @click="handleSave">保存草稿</el-button>
-        <el-button size="mini" @click="$router.back()">返回</el-button>
+        <el-button
+          type="primary"
+          :loading="btnLoading"
+          size="mini"
+          @click="handlePublish"
+          >发布</el-button
+        >
       </template>
     </PageHeader>
     <main class="main">
@@ -91,20 +101,21 @@
               type="text"
               style="width: 150px"
               size="mini"
-              placeholder="请输入自定义文章显示内容（200字以内）"
+              v-model="repairParam.repairTitle"
+              placeholder="请输入工单名称"
             ></el-input>
             <el-select
               size="mini"
               style="width: 291px"
               clearable
-              v-model="formParams.labelIdList"
-              placeholder="请选择"
+              v-model="repairParam.repairType"
+              placeholder="工单类型"
             >
               <el-option
-                v-for="item in labelList"
-                :key="item.labelId"
-                :label="item.labelName"
-                :value="item.labelId"
+                v-for="item in workOrderType"
+                :key="item.typeId"
+                :label="item.name"
+                :value="item.value"
               ></el-option>
             </el-select>
 
@@ -112,21 +123,26 @@
               size="mini"
               style="width: 291px"
               clearable
-              v-model="formParams.labelIdList"
-              placeholder="请选择"
+              v-model="repairParam.repairLevel"
+              placeholder="工单等级"
             >
               <el-option
-                v-for="item in labelList"
-                :key="item.labelId"
-                :label="item.labelName"
-                :value="item.labelId"
+                v-for="item in workOrderLevel"
+                :key="item.typeId"
+                :label="item.name"
+                :value="item.value"
               ></el-option>
             </el-select>
-            <el-button type="primary" size="mini" plain @click="handlePublish"
+            <el-button
+              type="primary"
+              size="mini"
+              plain
+              @click="handleSearchRepair"
               >搜索</el-button
             >
           </div>
           <wang-editor
+            ref="wangeditor"
             :content.sync="formParams.articleContent"
             @change="editorChange"
           ></wang-editor>
@@ -266,6 +282,17 @@
         >
       </span>
     </el-dialog>
+
+    <!-- 工单选择弹窗 -->
+    <el-dialog title="工单选择" :visible.sync="isRepairListShow">
+      <v-table
+        :table-data="repairList"
+        :column-data="repairCloumn"
+        :show-pagination="false"
+        @row-click="handleRepairRowClick"
+      >
+      </v-table>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -282,7 +309,10 @@ import {
   publishArticle,
   getArticleInfo,
   updateArticle,
+  getDcRepairList,
 } from "@/api/modules/knowledgeBase";
+
+import { getDicList } from "@/api/modules/common";
 
 import { formatSizeUnits, handleParam } from "@/utils";
 export default {
@@ -299,13 +329,23 @@ export default {
       default: "",
     },
   },
+  computed: {
+    // 工单类型
+    workOrderType() {
+      return this.dicList.length && this.dicList[0];
+    },
+    // 工单等级
+    workOrderLevel() {
+      return this.dicList.length && this.dicList[1];
+    },
+  },
   data() {
     // 标题校验
     const validateTitle = (rule, value, callback) => {
       if (!value) {
         return callback(new Error("请输入文章标题"));
       } else {
-        let regStr = /^[\u4E00-\u9FA5\w]{0,30}$/;
+        let regStr = /^[\u4E00-\u9FA5\da-zA-Z]{0,30}$/;
         console.log(regStr.test(value));
         if (regStr.test(value)) {
           callback();
@@ -319,7 +359,7 @@ export default {
       if (!value) {
         return callback(new Error("请输入文章简介"));
       } else {
-        let regStr = /[\u4E00-\u9FA5\w]+/;
+        let regStr = /[\u4E00-\u9FA5\da-zA-Z]+/;
         if (regStr.test(value)) {
           callback();
         } else {
@@ -328,6 +368,14 @@ export default {
       }
     };
     return {
+      // 保存加载中
+      saveBtnLoading: false,
+      // 按钮加载中
+      btnLoading: false,
+      // 文章状态
+      status: "",
+      // 字典数据
+      dicList: [],
       // 表单参数
       formParams: {
         articleTitle: "",
@@ -374,20 +422,6 @@ export default {
             required: true,
             message: "请输入内容",
             trigger: "blur",
-          },
-        ],
-        articleAttachmentList: [
-          {
-            required: true,
-            message: "请选择附件",
-            trigger: "change",
-          },
-        ],
-        linkArticleIdList: [
-          {
-            required: true,
-            message: "请选择关联文章",
-            trigger: "change",
           },
         ],
       },
@@ -462,12 +496,39 @@ export default {
 
       // 保存后的文章id 及 关联文章id集合
       savedArticleIdList: [],
+
+      // 工单参数
+      repairParam: {
+        repairTitle: "",
+        repairType: "",
+        repairLevel: "",
+      },
+      // 工单弹窗
+      isRepairListShow: false,
+      repairList: [],
+      repairCloumn: [
+        {
+          title: "工单名称",
+          field: "repairTitle",
+        },
+        {
+          title: "工单类型",
+          field: "repairType",
+        },
+        {
+          title: "工单等级",
+          field: "repairLevel",
+        },
+      ],
     };
   },
   created() {
+    this.getDicList();
     this.getClassificationList();
     this.getLabelList();
     this.getAuthorList();
+
+    window.addEventListener("storage", this.initEventListener, true);
 
     if (this.updateArticleId) {
       this.savedArticleIdList.push(this.updateArticleId);
@@ -475,7 +536,31 @@ export default {
       this.getArticleInfo();
     }
   },
+  destroyed() {
+    window.removeEventListener("storage", this.initEventListener, true);
+  },
   methods: {
+    /**
+     * @description: 监听工单引用变化
+     * @param {*}
+     */
+    initEventListener() {
+      this.$refs.wangeditor.append("1111");
+    },
+    /**
+     * @description: 获取字典数据
+     * @param {*}
+     */
+    async getDicList() {
+      for (let v of ["WORK_ORDER_TYPE", "WORK_ORDER_LEVEL"]) {
+        let { data } = await getDicList({
+          code: v,
+        });
+        if (data.code === undefined) {
+          this.dicList.push(data.content);
+        }
+      }
+    },
     /**
      * @description: 编辑时 获取文章信息
      * @param {*}
@@ -493,6 +578,7 @@ export default {
         }
         this.fileList = data.articleAttachmentList;
         this.linkArticleSelectedList = data.articleLinkList;
+        this.status = data.articleState_dictText;
       }
     },
     /**
@@ -678,9 +764,15 @@ export default {
     handleSave() {
       this.$refs.formArticle.validate(async (valid) => {
         if (valid) {
-          let res = await this.handleInsertOrUpdate("direct");
-          if (res) {
-            this.$router.back();
+          this.saveBtnLoading = true;
+          try {
+            let res = await this.handleInsertOrUpdate("direct");
+            if (res) {
+              this.$router.back();
+            }
+            this.saveBtnLoading = false;
+          } catch (error) {
+            this.saveBtnLoading = false;
           }
         }
       });
@@ -743,29 +835,34 @@ export default {
     handlePublish() {
       this.$refs.formArticle.validate(async (valid) => {
         if (valid) {
+          this.btnLoading = true;
           // 当新增成功后 进行发布
-          let res = await this.handleInsertOrUpdate();
-          if (res) {
-            let formData = new FormData();
-            handleParam(
-              {
-                articleIdList: this.savedArticleIdList,
-                publishOrUnPublishType: 1,
-              },
-              formData
-            );
-            let { data } = await publishArticle(formData);
-            if (data.code === undefined) {
-              this.$message({
-                type: "success",
-                message: "发布成功",
-              });
-              setTimeout(() => {
-                this.$router.back();
-              }, 1500);
+          try {
+            let res = await this.handleInsertOrUpdate();
+            if (res) {
+              let formData = new FormData();
+              handleParam(
+                {
+                  articleIdList: this.savedArticleIdList[0],
+                  publishOrUnPublishType: 1,
+                },
+                formData
+              );
+              let { data } = await publishArticle(formData);
+              if (data.code === undefined) {
+                this.$message({
+                  type: "success",
+                  message: "发布成功",
+                });
+                setTimeout(() => {
+                  this.$router.back();
+                }, 1500);
+              }
+              this.btnLoading = false;
             }
+          } catch (error) {
+            this.btnLoading = false;
           }
-        } else {
         }
       });
     },
@@ -779,6 +876,27 @@ export default {
           path: `/knowledge-detail/${this.savedArticleIdList[0]}`,
         });
       }
+    },
+    /**
+     * @description: 搜索关联工单确定
+     * @param {*}
+     */
+    async handleSearchRepair() {
+      let { data } = await getDcRepairList(this.repairParam);
+      if (data.code === undefined) {
+        this.repairList = data.content;
+        this.isRepairListShow = true;
+      }
+    },
+    /**
+     * @description: 跳转工单详情
+     * @param {*}
+     */
+    async handleRepairRowClick(data) {
+      let routeData = this.$router.resolve({
+        path: `/repair-detail/${data.repairId}`,
+      });
+      window.open(routeData.href, "_blank");
     },
   },
 };

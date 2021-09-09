@@ -4,7 +4,7 @@
  * @Autor: hh
  * @Date: 2021-08-19 10:34:30
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-08-27 14:33:55
+ * @LastEditTime: 2021-08-31 14:29:18
  */
 /**
  * 模块名称      知识库
@@ -63,6 +63,17 @@ export default [
           isMenu: true,
         },
         component: () => import("@/views/knowledgeBase/workBuild"),
+      },
+      {
+        path: "/repair-detail/:id",
+        name: "repairDetail",
+        meta: {
+          menuName: "工单知识详情",
+          isMenu: false,
+          parentPath: '/work-build'
+        },
+        props: true,
+        component: () => import("@/views/knowledgeBase/workBuild/detail"),
       },
       {
         path: "/base-manage",

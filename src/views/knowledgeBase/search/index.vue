@@ -4,7 +4,7 @@
  * @Autor: hh
  * @Date: 2021-08-19 10:41:30
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-08-27 16:51:42
+ * @LastEditTime: 2021-09-07 17:33:25
 -->
 <template>
   <div class="search-wrap">
@@ -67,7 +67,7 @@ export default {
     async getAllClassifyList() {
       let { data } = await getAllClassifyList();
       if (data.code === undefined) {
-        this.classifyList = data.slice(0, 14);
+        this.classifyList = data;
       }
     },
     /**

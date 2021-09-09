@@ -73,11 +73,11 @@ export default {
           }],
           table_list:[
           {prop: "xh_id", label: "序号"},
-          {prop: "statusId", label: "statusId"},
-          {prop: "docId", label: "docId"},
-          {prop: "typeId", label: "typeId"},
-          {prop: "name", label: "name"},
-          { prop: "iconPath", label: "iconPath"},
+          {prop: "samplingId", label: "samplingId"},
+          {prop: "samplingTitle", label: "samplingTitle"},
+          {prop: "samplingYear", label: "samplingYear"},
+          {prop: "samplingFile", label: "samplingFile"},
+          {prop:"creationDate", label:"creationDate"}
           ],
           select:[
               {title:"samplingFile",types:"inputs",},
@@ -101,7 +101,7 @@ export default {
           this.Tabular()
         }
       }if(type=='dictionary_del'){
-        let thisData = newdata[index].typeId
+        let thisData = newdata[index].samplingId
         try{
           await Deletes(thisData)
           // this.Tabular()
@@ -110,6 +110,8 @@ export default {
           console.log("err", err);
         }
       }if(type=='dictionary_edit'){
+        // console.log(newdata)
+        // return
         try{
           await Updates(newdata)
           this.$refs.Pages.the_actions('add')
@@ -128,7 +130,6 @@ export default {
       console.log('每页显示条数：'+data2)
     },
     async Tabular() {
-        console.log(123)
       let data ={
     //   typeId:this.$route.query.typeId,
       page:'0',
@@ -136,7 +137,7 @@ export default {
     }
     try{
     let thisData = await processTransactionPage(data)
-    console.log(thisData.data.content)
+    // console.log(thisData.data.content)
     thisData.data.content.forEach((v,index) => {
       v['xh_id']=index+1
     })

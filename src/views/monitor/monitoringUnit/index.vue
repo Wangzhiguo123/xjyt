@@ -27,8 +27,6 @@
 </template>
 
 <script>
-// import api from "@/api/apiList";
-import { proWells } from "@/api/modules/productionMonitoring";
 export default {
   name: "MonitoringUnit",
   components: {
@@ -72,21 +70,6 @@ export default {
   methods: {
     handleClick(tab, event) {
       console.log(tab, event);
-    },
-    /**
-     * @description:示例
-     * @param {params:参数}
-     * @param {routeValue:路由参数}
-     * @return:
-     */
-    async getProWells() {
-      let routeValue = {
-        organizationId: 1,
-        id: '测试',
-      };
-      let params = {}
-      let res = await proWells(params,routeValue);
-      this.basicDate = res;
     },
   },
 };

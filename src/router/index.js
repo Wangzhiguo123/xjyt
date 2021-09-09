@@ -2,7 +2,7 @@
  * @Description: 路由引入
  * @Autor: hh
  * @Date: 2021-08-17 17:14:03
- * @LastEditTime: 2021-08-24 09:30:10
+ * @LastEditTime: 2021-08-31 15:24:03
  */
 
 /**
@@ -18,8 +18,9 @@ import VueRouter from "vue-router";
 import knowledgeBase from "./modules/knowledgeBase";
 import operationAnalysis from "./modules/operationAnalysis";
 import productionMonitoring from "./modules/productionMonitoring";
-import carManagement  from "./modules/carManagement";
-import flightManagement from "./modules/flightManagement"
+import carManagement from "./modules/carManagement";
+import flightManagement from "./modules/flightManagement";
+import kpi from "./modules/kpi";
 Vue.use(VueRouter);
 
 // const modules = require.context("./", true, /\.js$/);
@@ -32,7 +33,8 @@ const routes = [
   ...operationAnalysis,
   ...productionMonitoring,
   ...carManagement,
-  ...flightManagement
+  ...flightManagement,
+  ...kpi,
 ];
 
 const router = new VueRouter({

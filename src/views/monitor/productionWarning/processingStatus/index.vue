@@ -1,9 +1,9 @@
-<!-- 生产监控报警管理-处理状态 -->
+<!-- 生产监控报警管理-处理方式 -->
 <template>
   <div class="productionWarning">
        <el-form :model="formInline" class="form">
                 <el-row> <el-col :span="4">
-                         <el-form-item label="处理状态">
+                         <el-form-item label="处理方式">
                             <el-input v-model="formInline.name"
                                       style="width: 160px"/></el-form-item></el-col>
                         <el-col :span="4">

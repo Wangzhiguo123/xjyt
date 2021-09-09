@@ -1,6 +1,6 @@
 export const tbColumnCon = [
   {
-    title: "处理状态",
+    title: "处理方式",
     field: "name",
   },
   {

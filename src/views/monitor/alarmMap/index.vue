@@ -2,53 +2,81 @@
 <template>
   <div class="alarmMap">
     <baidu-map class="map" :center="center" :zoom="zoom" @ready="handler">
-      <bm-control class="tabs">
+      <!-- <bm-control class="tabs">
         <mapTabs :plant-area="plantArea"></mapTabs>
-      </bm-control>
+      </bm-control> -->
+      <!-- 左侧表格 -->
       <bm-control :offset="{ width: '100px', height: '10px' }">
         <bm-auto-complete v-model="keyword" :sug-style="{ zIndex: 1 }">
           <searchield
+            ref="searchield"
+            class="searchield"
             :search-data="searchData"
-            @isShow="showChange"
+            @alertInfoShow="alertInfoShow"
+            @carInfoInfoShow="carInfoInfoShow"
             @changePosition="changeAddress"
-            @seeInfo="proQueryByAlertIds"
           ></searchield>
         </bm-auto-complete>
       </bm-control>
-      <bm-control class="alertInfo">
+      <!-- 搜索条 -->
+      <bm-control class="select">
         <bm-auto-complete>
-          <alertInfo :info-data="infoData" :infoDataTit="infoDataTit"></alertInfo>
+          <selectModel ref="select"></selectModel>
         </bm-auto-complete>
       </bm-control>
-      <bm-control class="dispatch">
+      <!-- 参数告警基础信息 -->
+      <bm-control class="alertInfo">
+        <bm-auto-complete>
+          <alertInfo
+            class="alertInfo"
+            ref="alertInfo"
+            :info-data="paramsData"
+            @handleAlarm="handleAlarm"
+          ></alertInfo>
+        </bm-auto-complete>
+      </bm-control>
+      <!-- 车辆告警基础信息 -->
+      <bm-control class="carInfo">
+        <bm-auto-complete>
+          <carInfo
+            class="carInfoInfo"
+            ref="carInfoInfo"
+            :info-data="carData"
+          ></carInfo>
+        </bm-auto-complete>
+      </bm-control>
+
+      <!-- <bm-control class="dispatch">
         <bm-auto-complete>
           <dispatch></dispatch>
         </bm-auto-complete>
-      </bm-control>
+      </bm-control> -->
       <!-- <bm-control class="repairOrder">
         <bm-auto-complete>
           <repairOrder></repairOrder>
         </bm-auto-complete>
       </bm-control>-->
-    </baidu-map> 
+    </baidu-map>
   </div>
 </template>
 
 <script>
-import api from "@/api/apiList";
-import searchield from "@/components/baiduMap/searchield";
-import mapTabs from "@/components/baiduMap/mapTabs";
-import alertInfo from "@/components/baiduMap/alertInfo";
-import dispatch from "@/components/baiduMap/dispatch";
+import searchield from "../components/searchield";
+import mapTabs from "../components/mapTabs";
+import dispatch from "../components/dispatch";
+import selectModel from "../components/selectModel";
+import alertInfo from "../components/alertInfo";
+import carInfo from "../components/carInfo";
 // import repairOrder from "@/components/baiduMap/repairOrder";
-
 export default {
   name: "AlarmMap",
   components: {
     searchield,
     mapTabs,
-    alertInfo,
     dispatch,
+    selectModel,
+    alertInfo,
+    carInfo,
     // repairOrder,
   },
   data() {
@@ -79,7 +107,7 @@ export default {
           subTitle: "",
           ident: "production",
           isShow: false,
-          data:[]
+          data: [],
         },
         { type: 3, title: "气井", subTitle: "10", ident: "three" },
         { type: 3, title: "集气站", subTitle: "8", ident: "three" },
@@ -114,84 +142,53 @@ export default {
           ],
         },
       ],
-      //报警基础信息
-      // infoData: [
-      //   { title: "[处理状态]", text: "待处理/处理中/已处理" },
-      //   { title: "[位置信息]", text: "新疆克拉玛依市百口泉" },
-      //   { title: "[告警区块]", text: "采气一厂" },
-      //   { title: "[关联对象]", text: "井DXHW179" },
-      //   { title: "[报警类型]", text: "参数报警/其他报警" },
-      //   { title: "[报警分类]", text: "高高报/高报/低报/低低报" },
-      //   { title: "[报警等级]", text: "普通/严重/特别严重" },
-      //   { title: "[参数名称]", text: "二级节流后温度" },
-      //   { title: "[实际/参考值]", text: "60°/30°" },
-      //   { title: "[报警时间]", text: "2021-07-06 18:28:31" },
-      //   { title: "[解决方案]", text: "二级节流文档过高处理方案" },
-      // ],
-      infoData: [
-        { title: "[处理状态]" },
-        { title: "[位置信息]" },
-        { title: "[告警区块]"},
-        { title: "[关联对象]"},
-        { title: "[报警类型]"},
-        { title: "[报警分类]"},
-        { title: "[报警等级]"},
-        { title: "[参数名称]"},
-        { title: "[实际/参考值]"},
-        { title: "[报警时间]"},
-        { title: "[解决方案]"},
+      paramsData: [
+        { title: "处理状态", name: "actualValue", value: "22" },
+        { title: "关联对象", name: "actualValue", value: "" },
+        { title: "告警类型", name: "actualValue", value: "" },
+        { title: "告警分类", name: "actualValue", value: "" },
+        { title: "告警等级", name: "actualValue", value: "" },
+        { title: "参数名称", name: "actualValue", value: "" },
+        { title: "实际/参考值", name: "actualValue", value: "" },
+        { title: "告警时间", name: "actualValue", value: "" },
+        { title: "解决方案", name: "actualValue", value: "" },
       ],
-      infoDataTit:[
-        {text: "待处理/处理中/已处理" },
-        {text: "新疆克拉玛依市百口泉" },
-        {text: "采气一厂" },
-        {text: "井DXHW179" },
-        {text: "参数报警/其他报警" },
-        {text: "高高报/高报/低报/低低报" },
-        {text: "普通/严重/特别严重" },
-        {text: "二级节流后温度" },
-        {text: "60°/30°" },
-        {text: "2021-07-06 18:28:31" },
-        {text: "二级节流文档过高处理方案" },
+      carData: [
+        { title: "车牌号码", name: "licensePlateNumber", value: "22" },
+        { title: "车牌颜色", name: "licensePlateColor", value: "" },
+        { title: "告警信息", name: "type", value: "" },
+        { title: "行车速度", name: "speed", value: "" },
+        { title: "行驶里程", name: "mileage", value: "" },
+        { title: "车辆状态", name: "carStatus", value: "" },
+        { title: "开始时间", name: "startTime", value: "" },
+        { title: "结束时间", name: "endTime", value: "" },
+        { title: "位置信息", name: "actualValue", value: "" },
       ],
       center: { lng: 0, lat: 0 },
       zoom: 3,
       keyword: "",
     };
   },
-  mounted() {
-    this.getFilmList();
-  },
+  mounted() {},
   methods: {
-    //表格显示隐藏
-    showChange(value) {
-      this.searchData.forEach((item) => {
-        if (item.ident === value) {
-          item.isShow = !item.isShow;
-        }
-      });
-      console.log("this.searchData", this.searchData);
+    //参数告警基础信息
+    alertInfoShow (row) {
+      this.$refs.alertInfo.exhibition = true;
+      this.$refs.alertInfo.queryList(row);
+    },
+    //车辆告警基础信息
+    carInfoInfoShow (row) {
+      this.$refs.carInfoInfo.exhibition = true;
+      this.$refs.carInfoInfo.queryList(row);
     },
     //表格定位
-    changeAddress(lng, lat) {
-      console.log(lng, lat);
-      this.center.lng = lng;
-      this.center.lat = lat;
+    changeAddress(value) {
+      this.center.lng = value.lng;
+      this.center.lat = value.lat;
     },
-    //获取生产监控表格数据
-    async getFilmList() {
-      console.log('this.searchData[1]',this.searchData[1]);
-
-      let res = await this.$http.get(api.proMonitorAlertInfos);
-      this.searchData[1].data = res;
-      console.log("res", res);
-    },
-    //查询警报详情
-    async proQueryByAlertIds(data) {
-      console.log('proQueryByAlertIds',data)
-      let res = await this.$http.get(api.proQueryByAlertIds);
-      // this.infoData = res;
-      this.infoDataTit = res;
+    //打开报警处理
+    handleAlarm(data){
+      this.$refs.searchield.handleAlarm(data);
     },
     //地图参数
     handler({ BMap, map }) {
@@ -199,10 +196,6 @@ export default {
       this.center.lng = 84.86225;
       this.center.lat = 45.5908;
       this.zoom = 15;
-    },
-    //切换激活
-    handleClick(tab, event) {
-      console.log(tab, event);
     },
   },
 };
@@ -221,14 +214,19 @@ export default {
     width: 880px;
   }
 }
-.alertInfo {
-  margin-left: 640px;
-  margin-top: 140px;
-}
+
 /deep/ .el-tabs__header {
   margin-bottom: 0;
 }
-.anchorTL {
-  width: 100px;
+.alertInfo {
+  margin-left: 400px;
+  z-index: 0 !important;
+}
+/deep/.anchorTL{
+  z-index: 0 !important;
+}
+.carInfoInfo {
+  margin-top: 60px;
+  margin-left: 700px;
 }
 </style>

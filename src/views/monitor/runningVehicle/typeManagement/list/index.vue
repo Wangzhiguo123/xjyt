@@ -1,77 +1,63 @@
-<!-- 生产监控报警管理-运行车辆告警管理-车辆类型报警管理 -->
+<!-- 生产监控-车辆告警类型 -->
 <template>
-  <div class="productionWarning">
+  <div class="carAlertsType">
        <el-form :model="formInline" class="form">
-                <el-row> <el-col :span="4">
-                         <el-form-item label="报警信息">
-                         <el-input v-model="formInline.paramName"
-                                   style="width: 160px"/></el-form-item></el-col>
-                         <el-col :span="7"> 
-                                 <el-form-item label="报警时间">
-                                 <el-date-picker
-                                      style="width: 280px"
-                                      v-model="formInline.alterTime"
-                                      format="yyyy-MM-dd HH:mm:ss"
-                                      type="daterange"
-                                      range-separator="至"
-                                      start-placeholder="开始日期"
-                                      end-placeholder="结束日期"></el-date-picker> </el-form-item></el-col>
-                        <el-col :span="4">
-                                <el-form-item label="报警类型">
-                                <el-select v-model="formInline.type" style="width: 160px">
-                                          <el-option label="区域一" value="shanghai"></el-option>
-                                          <el-option label="区域二" value="beijing"></el-option></el-select></el-form-item></el-col>
-                        <el-col :span="4">
-                                <el-form-item label="处理状态">
-                                <el-select v-model="formInline.status" style="width: 160px">
-                                          <el-option label="区域一" value="shanghai"></el-option>
-                                          <el-option label="区域二" value="beijing"></el-option></el-select></el-form-item></el-col>
-                        <el-col :span="4">
-                          <el-button @click="queryList">搜索</el-button>
-                          <el-button @click="onSubmit">导出</el-button></el-col></el-row></el-form>
+                <el-row> <el-col :span="5">
+                         <el-form-item label="车辆告警类型">
+                            <el-input v-model="formInline.name"
+                                      style="width: 160px"/></el-form-item></el-col>
+                        <el-col :span="5">
+                            <el-form-item label="告警类型编码">
+                            <el-input v-model="formInline.code"
+                                      style="width: 160px"/></el-form-item></el-col>
+                        <el-col :span="5">
+                          <el-button type="primary" @click="queryList">搜索</el-button>
+                          <el-button @click="onSubmit">新增</el-button></el-col></el-row></el-form>
         <tableCom :table-data="tableData"
                   :column-data="tbColumnCon"
-                  style="width: 80%"
+                  style="width: 40%"
                   :current.sync="pagination.current"
                   :size.sync="pagination.size"
                   :total-count="pagination.totalCount"
                   :columnCheck="true"
                   :show-pagination="true"
-                  @query-data="queryList"
-                  :sortable="true">
-                  <el-table-column slot="column9"
+                  @query-data="queryList">
+                  <el-table-column slot="column3"
                                   slot-scope="row"
                                   :label="row.title"
                                   :width="row.width"
+                                  :prop="row.field"
                                   :min-width="row.minWidth"
                                   sortable>
                   <template slot-scope="scoped">
                     <div class="operation">
-                      <p @click="openhandle(scoped.row)">报警类型</p>
-                      <p>派遣工单</p>
-                      <p>监控画面</p>
+                      <p @click="openhandle(scoped.row)">编辑</p>
+                      <p @click="opendel(scoped.row)">删除</p>
                     </div></template></el-table-column></tableCom>
+      <addOrEdit ref="addOrEdit"></addOrEdit>
+      <del-modal ref="delModal" @confirm="delConfirm"></del-modal>
   </div>
 </template>
 
 <script>
-import tableCom from "@/components/tableCom";
-import moment from "moment";
-import { productionAlerts,handleResults } from "@/api/modules/productionMonitoring";
+import tableCom from "@/components/tableCom"; 
+import delModal from "@/components/delModal";
+import { carAlertsTypePage,carAlertsTypeDel } from "@/api/modules/productionMonitoring";
+import addOrEdit from "../addOrEdit";
 import { tbColumnCon } from "./config";
 export default {
-  name: "ProductionWarning",
+  name: "carAlertsType",
   components: {
     tableCom,
+    addOrEdit,
+    delModal
   },
   data() {
     return {
       //表单信息
       formInline: {
-        paramName: "",
-        alterTime: "",
-        type: "",
-        status: "",
+        name: "",
+        code: "",
       },
       //表头数据
       tbColumnCon,
@@ -91,18 +77,29 @@ export default {
   },
   methods: {
     onSubmit() {
-      console.log("submit!");
+       this.$refs.addOrEdit.show()
     },
     formatter(row, column) {
       return row.address;
     },
-    //报警类型处理
+    //车辆类型处理
     openhandle (data) {
-      this.$refs.handleModal.show(data);
+       this.$refs.addOrEdit.show(data)
     },
-    //告警处理
-    async confirm (data) {
-       let res = await handleResults(data);
+    //车辆类型删除
+    opendel (data) {
+       this.$refs.delModal.show(data)
+    },
+    //确认删除
+    async delConfirm (data) {
+      console.log('res',data)
+      let res = await carAlertsTypeDel(data);
+      console.log('res',res)
+      if (res.status === 204) {
+        this.queryList();
+      } else {
+        this.$Message.error('删除失败');
+      }
     },
     //查询列表
     async queryList() {
@@ -110,29 +107,18 @@ export default {
         ...this.formInline,
         current: this.pagination.current - 1,
         size: this.pagination.size,
+        tenantId:0
       };
-      if (params.alterTime) {
-        params.alertStartTime = moment(params.alterTime[0]).format(
-          "YYYY-MM-DD HH:mm:ss"
-        );
-        params.alertEndTime = moment(params.alterTime[1]).format(
-          "YYYY-MM-DD HH:mm:ss"
-        );
-      } else {
-        params.alertStartTime = "";
-        params.alertEndTime = "";
-      }
-      let res = await productionAlerts(params);
+      let res = await carAlertsTypePage(params);
       this.tableData = res.data.content || [];
-      this.pagination.totalCount = res.data.totalPages;
+      this.pagination.totalCount = Number(res.data.totalElements);
     }
-
   },
 };
 </script>
 
 <style lang="less" scoped>
-.productionWarning {
+.carAlertsType {
   min-width: calc(100vh - 300px);
   min-width: 1440px;
   padding-left: 30px;

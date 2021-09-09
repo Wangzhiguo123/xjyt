@@ -47,7 +47,7 @@
                                   sortable>
                   <template>
                     <div class="operation">
-                      <p @click="openhandle">报警类型</p>
+                      <p @click="openhandle">报警处理</p>
                       <p>派遣工单</p>
                       <p>监控画面</p>
                     </div></template></el-table-column></tableCom>
@@ -60,7 +60,7 @@
 import tableCom from "@/components/tableCom";
 import moment from "moment";
 import { productionAlerts } from "@/api/modules/productionMonitoring";
-import handleModal from "../../components/handleModal.vue";
+import handleModal from "../../components/handleModal";
 import relationModal from "../../components/relationModal.vue";
 import { tbColumnCon } from "./config";
 export default {

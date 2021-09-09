@@ -2,11 +2,16 @@
 <template>
   <div class="productionWarning">
        <el-form :model="formInline" class="form">
-                <el-row> <el-col :span="4">
+                <el-row> <el-col :span="5">
                          <el-form-item label="报警信息">
                          <el-input v-model="formInline.paramName"
                                    style="width: 160px"/></el-form-item></el-col>
-                         <el-col :span="7"> 
+                        <el-col :span="5">
+                                <el-form-item label="车牌号码">
+                                <el-select v-model="formInline.type" style="width: 160px">
+                                          <el-option label="区域一" value="shanghai"></el-option>
+                                          <el-option label="区域二" value="beijing"></el-option></el-select></el-form-item></el-col>
+                        <el-col :span="7"> 
                                  <el-form-item label="报警时间">
                                  <el-date-picker
                                       style="width: 280px"
@@ -16,12 +21,12 @@
                                       range-separator="至"
                                       start-placeholder="开始日期"
                                       end-placeholder="结束日期"></el-date-picker> </el-form-item></el-col>
-                        <el-col :span="4">
-                                <el-form-item label="报警类型">
+                       <el-col :span="5">
+                                <el-form-item label="运营类型">
                                 <el-select v-model="formInline.type" style="width: 160px">
                                           <el-option label="区域一" value="shanghai"></el-option>
                                           <el-option label="区域二" value="beijing"></el-option></el-select></el-form-item></el-col>
-                        <el-col :span="4">
+                        <el-col :span="5">
                                 <el-form-item label="处理状态">
                                 <el-select v-model="formInline.status" style="width: 160px">
                                           <el-option label="区域一" value="shanghai"></el-option>
@@ -57,7 +62,7 @@
 <script>
 import tableCom from "@/components/tableCom";
 import moment from "moment";
-import { productionAlerts,handleResults } from "@/api/modules/productionMonitoring";
+import { carAlertsPage,handleResults } from "@/api/modules/productionMonitoring";
 import { tbColumnCon } from "./config";
 export default {
   name: "ProductionWarning",
@@ -122,7 +127,7 @@ export default {
         params.alertStartTime = "";
         params.alertEndTime = "";
       }
-      let res = await productionAlerts(params);
+      let res = await carAlertsPage(params);
       this.tableData = res.data.content || [];
       this.pagination.totalCount = res.data.totalPages;
     }

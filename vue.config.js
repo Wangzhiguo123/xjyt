@@ -4,13 +4,15 @@
  * @Autor: hh
  * @Date: 2021-08-18 10:25:24
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-08-27 10:05:47
+ * @LastEditTime: 2021-09-07 15:14:06
  */
 const path = require("path");
 const debug = process.env.NODE_ENV === "development";
 function resolve(dir) {
   return path.join(__dirname, dir);
 }
+require('events').EventEmitter.defaultMaxListeners = 0
+
 module.exports = {
   publicPath: process.env.VUE_APP_PUBLICPATH,
   productionSourceMap: false,
@@ -65,17 +67,104 @@ module.exports = {
     port: 8000,
     proxy: {
       "/api": {
-        // target: "http://pss-knowledge.cddev.cddpi.com",
-        // target: "http://192.168.16.35:8088",
-        // target: "http://192.168.6.107:18092",
-        target:"http://192.168.6.107:18100/",
-        // target: "http://192.168.16.72:18092",
-        // target: "http://192.168.7.5:18080",
-        // target: "http://192.168.16.56:18080",
+        target: "http://pss-knowledge.cddev.cddpi.com",
         changeOrigin: true,
         ws: true,
         pathRewrite: {
           "^/api": "",
+        },
+      },
+      "/passsystem": {
+        target: "http://192.168.7.162:18100",
+        changeOrigin: true,
+        ws: true,
+        pathRewrite: {
+          "^/passsystem": "",
+        },
+      },
+      "/passknowledge": {
+        // target: "http://192.168.6.150:18098",
+        target: "http://pss-knowledge-test.cddev.cddpi.com",
+        changeOrigin: true,
+        pathRewrite: {
+          "^/passknowledge": "",
+        },
+      },
+      "/passrepair": {
+        target: "http://192.168.6.150:18086",
+        changeOrigin: true,
+        pathRewrite: {
+          "^/passrepair": "",
+        },
+      },
+      //ceshi
+      "/paramAlerts": {
+        target: "http://192.168.16.35:18103",
+        changeOrigin: true,
+        pathRewrite: {
+          "^/paramAlerts": "",
+        },
+      },
+      //监控
+      "/bese": {
+        target: "http://192.168.16.35:18080",
+        changeOrigin: true,
+        pathRewrite: {
+          "^/bese": "",
+        },
+      },
+      "/flight": {
+        target: "http://192.168.16.94:18102",
+        changeOrigin: true,
+        pathRewrite: {
+          "^/flight": "",
+        },
+      },
+      "/passkpi": {
+        target: "http://192.168.16.68:18090",
+        // target: "http://192.168.7.162:18090",
+        changeOrigin: true,
+        pathRewrite: {
+          "^/passkpi": "",
+        },
+      },
+      "/employee": {
+        target: "http://192.168.16.94:18100",
+        changeOrigin: true,
+        pathRewrite: {
+          "^/employee": "",
+        },
+      },
+      // 车辆管理
+      "/vehicle": {
+        // target: "http://192.168.16.75:18080/",
+        target: "http://192.168.16.35:18080/",
+        changeOrigin: true,
+        pathRewrite: {
+          "^/vehicle": "",
+        },
+      },
+      //车辆监控报警模块
+      "/carWarning": { 
+        // target: "http://192.168.16.75:18094",
+        target: "http://192.168.16.75:18094/",
+        changeOrigin: true,
+        pathRewrite: {
+          "^/carWarning": "",
+        },
+      },
+      "/annuaPlan": {
+        target: "http://192.168.6.107:18088",
+        changeOrigin: true,
+        pathRewrite: {
+          "^/annuaPlan": "",
+        },
+      },
+      "/workManage": {
+        target: "http://192.168.6.107:18100",
+        changeOrigin: true,
+        pathRewrite: {
+          "^/workManage": "",
         },
       },
     },

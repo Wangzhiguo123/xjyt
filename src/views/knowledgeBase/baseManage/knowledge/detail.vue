@@ -1,7 +1,7 @@
 <!--
  * @Description: 文章详情页
  * @Date: 2021-08-26 16:08:29
- * @LastEditTime: 2021-08-27 17:17:16
+ * @LastEditTime: 2021-09-07 14:29:46
 -->
 <template>
   <div class="detail-container" v-if="infoObj" v-loading="loading">
@@ -17,13 +17,20 @@
           <!-- <img src="@/assets/logo.png" class="avatar" /> -->
           <svg-icon iconClass="avatar" className="avatar"></svg-icon>
           <span class="text">{{ infoObj.articleAuthorName }}</span>
-          <span class="time text">{{ infoObj.creationDate }}</span>
+          <span class="time text">{{
+            infoObj.creationDate.split(" ")[0]
+          }}</span>
           <p class="text">
             发布在<span class="label">{{ classifyValues }}</span
             >下
           </p>
         </div>
-        <div class="body" v-html="infoObj.articleContent"></div>
+        <div class="introduction">
+          {{infoObj.articleIntroduction}}
+        </div>
+        <div class="w-e-text-box-custome">
+          <div class="body w-e-text" v-html="infoObj.articleContent"></div>
+        </div>
       </aside>
       <aside class="right">
         <div class="part">
@@ -82,9 +89,12 @@
             >
               <p class="s-left">
                 <span class="dot"></span>
-                <span class="label textOverflow">{{
-                  item.attachmentRealName
-                }}</span>
+                <a
+                  :href="urlComputed(item.attachmentSaveUrl)"
+                  target="_blank"
+                  class="label textOverflow"
+                  >{{ item.attachmentRealName }}</a
+                >
               </p>
               <p class="s-right">
                 <span class="text">{{ item.attachmentSizeAssemble }}</span>
@@ -124,6 +134,12 @@ export default {
           .join("/")
       );
     },
+    // urlComputed
+    urlComputed(){
+      return (url) => {
+        return `${process.env.VUE_APP_BASE_OSS}${url}`
+      }
+    }
   },
   watch: {
     id() {
@@ -203,6 +219,16 @@ export default {
           margin: 0 8px;
           color: #1982ed;
         }
+      }
+      .introduction{
+        padding: 5px;
+        background-color: #f0f2f5;
+      }
+      .body {
+        padding-left: 0px;
+        line-height: 24px;
+        font-size: 14px;
+        color: rgba(0, 0, 0, 0.85);
       }
     }
     .right {

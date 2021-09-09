@@ -1,7 +1,7 @@
 <!--
  * @Description: 搜索tab
  * @Date: 2021-08-27 11:03:33
- * @LastEditTime: 2021-08-27 16:33:46
+ * @LastEditTime: 2021-09-07 17:34:27
 -->
 <template>
   <div class="nav-container">
@@ -13,7 +13,13 @@
         @click="tabClick(item)"
         >{{ item.classificationName }}</span
       >
-      <a class="item" v-if="moreList.length" href="javascript:void(0);" @click="toggleMore">更多</a>
+      <a
+        class="item"
+        v-if="moreList.length"
+        href="javascript:void(0);"
+        @click="toggleMore"
+        >更多</a
+      >
     </ul>
 
     <ul
@@ -68,6 +74,7 @@ export default {
      */
     tabClick(val) {
       this.$emit("handleClick", val.classificationId);
+      this.isMoreShow = false;
     },
     /**
      * @description: 处理更多分类切换
@@ -154,6 +161,8 @@ export default {
   }
   .extra-box {
     position: absolute;
+    max-height: 115px;
+    overflow-y: auto;
     right: -100px;
     display: grid;
     grid-template-columns: 1fr 1fr;

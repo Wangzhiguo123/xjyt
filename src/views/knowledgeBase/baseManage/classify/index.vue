@@ -3,20 +3,20 @@
  * @Autor: hh
  * @Date: 2021-08-19 15:04:39
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-08-30 10:02:22
+ * @LastEditTime: 2021-09-07 14:37:21
 -->
 <template>
   <div class="classify">
     <nav-bar></nav-bar>
 
     <main class="content">
-       <aside class="input-box">
+      <aside class="input-box">
         <el-input
           style="width: 300px"
           v-model="keyword"
           clearable
           size="mini"
-          placeholder="请输入标签名称或创建人"
+          placeholder="请输入类别名称或创建人"
         ></el-input>
         <el-button
           style="margin: 0 10px"
@@ -31,14 +31,20 @@
         <el-button type="primary" size="mini" plain @click="handleAdd"
           >添加类别</el-button
         >
-        <el-button size="mini" :disabled="!classifyIds.length" plain @click="handleMultiDelete"
+        <el-button
+          size="mini"
+          :disabled="!classifyIds.length"
+          plain
+          @click="handleMultiDelete"
           >批量删除</el-button
         >
       </aside>
 
       <v-table
-        style=" margin-top: 15px"
+        style="margin-top: 15px"
         :loading="loading"
+        ref="table"
+        _ref="table"
         :table-data="tableData"
         :column-data="columnData"
         :current.sync="listQuery.page"
@@ -168,11 +174,11 @@ export default {
      * @return {*}
      */
     handleAdd() {
-      this.$prompt("请输入类别名称", "提示", {
+      this.$prompt("请输入类别名称", "添加", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        inputPattern: /^[\u4e00-\u9fa5\w]{0,10}$/,
-        inputErrorMessage: "类别不能包含特殊字符，10字以内",
+        inputPattern: /^[\u4e00-\u9fa5\da-zA-Z]{1,10}$/,
+        inputErrorMessage: "请输入类别名称且不能包含特殊字符",
       })
         .then(async ({ value }) => {
           let { data } = await addClassify({
@@ -283,13 +289,14 @@ export default {
           };
           let { data } = await delClassifies(param);
           if (data.code === undefined) {
-            this.restParam();
-            this.getClassifyList();
             this.$message({
               type: "success",
               message: "删除成功!",
             });
           }
+          this.restParam();
+          this.getClassifyList();
+          this.$refs.table.clearSelection();
         })
         .catch(() => {});
     },

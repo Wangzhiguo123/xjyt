@@ -15,7 +15,7 @@
                                 <el-input v-model="formInline.name"/></el-form-item>
                  <el-form-item label="车辆组织编码"  prop="code">
                                 <el-input v-model="formInline.code"/></el-form-item>
-                 <el-form-item label="备注"  prop="remarks">
+                 <el-form-item label="备注" >
                                 <el-input v-model="formInline.remarks"/></el-form-item>
         </el-form>
       </div>

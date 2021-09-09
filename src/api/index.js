@@ -8,12 +8,14 @@ import axiosService from "./request";
  * @returns {promise} 返回promise对象
  */
 export const get = (urlKey, params) => {
+  let whiteArr = ["template", "export"];
   let myConfig = {
     params: params || [],
     // headers: {}
   };
-  // let myConfig = params;
-  // console.log(myConfig)
+  if (whiteArr.some((it) => urlKey.includes(it))) {
+    myConfig.responseType = "arraybuffer";
+  }
   return new Promise((resolve, reject) => {
     axiosService
       .get(urlKey, myConfig)
