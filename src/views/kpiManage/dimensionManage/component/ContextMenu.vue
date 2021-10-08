@@ -1,11 +1,10 @@
 <!--
  * @Description: 右键菜单
  * @Date: 2021-09-01 10:25:50
- * @LastEditTime: 2021-09-01 14:53:20
+ * @LastEditTime: 2021-09-18 11:18:49
 -->
 <template>
   <div class="contextmenu" :style="boundingClient" v-show="isShow">
-    <div class="title">节点操作</div>
     <ul class="box">
       <li
         class="item"
@@ -13,7 +12,9 @@
         :key="item.key"
         @click="handleClick(item)"
       >
-        {{ item.value }}
+        <div class="part">
+          {{ item.label }}
+        </div>
       </li>
     </ul>
   </div>
@@ -31,27 +32,23 @@ export default {
         return [
           {
             key: "append",
-            value: "添加子节点",
+            label: "添加子节点",
           },
           {
-            key: "prev",
-            value: "上方添加节点",
-          },
-          {
-            key: "next",
-            value: "下方添加节点",
+            key: "sibling",
+            label: "添加同层节点",
           },
           {
             key: "update",
-            value: "修改节点",
+            label: "修改节点",
           },
           {
             key: "delete",
-            value: "删除",
+            label: "删除",
           },
           {
             key: "cancel",
-            value: "取消",
+            label: "取消",
           },
         ];
       },
@@ -92,18 +89,33 @@ export default {
 .contextmenu {
   position: absolute;
   font-size: 16px;
-  background-color: lightcyan;
-  .title {
-    line-height: 20px;
-    padding-left: 6px;
-    color: #000;
-  }
+  background: #ffffff;
+  z-index: 100;
   .box {
-    width: 300px;
+    width: 212px;
+    padding: 4px 4px;
+    border-radius: 4px;
+    box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.2);
     .item {
-      padding-left: 30px;
-      line-height: 20px;
       color: #000;
+      cursor: pointer;
+      padding:4px 4px;
+      border-bottom: 1px solid #f5f5f5;
+      &:last-child{
+        border-bottom: 0;
+      }
+      .part {
+        height: 36px;
+        padding-left: 6px;
+        line-height: 36px;
+        color: rgba(0, 0, 0, 0.85);
+        text-align: left;
+        font-size: 14px;
+        &:hover {
+          background-color: #e8f3fd;
+          color: #1982ed;
+        }
+      }
     }
   }
 }

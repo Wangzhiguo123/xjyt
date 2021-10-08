@@ -1,58 +1,64 @@
 <!-- 生产监控报警管理-参数报警 -->
 <template>
   <div class="productionWarning">
-       <el-form :model="formInline" class="form">
-                <el-row> <el-col :span="4">
-                         <el-form-item label="报警信息">
-                         <el-input v-model="formInline.paramName"
-                                   style="width: 160px"/></el-form-item></el-col>
-                         <el-col :span="7"> 
-                                 <el-form-item label="报警时间">
+       <el-form :model="formInline" :inline="true"  class="form" ref="ruleForm">
+                        <el-form-item label="告警区块" prop="type">
+                                  <el-select v-model="formInline.type">
+                                             <el-option label="区域一" value="shanghai"></el-option>
+                                             <el-option label="区域二" value="beijing"></el-option></el-select></el-form-item></el-col>
+                                <el-form-item label="告警对象" prop="alertTypeName">
+                                <el-select v-model="formInline.alertTypeName">
+                                          <el-option label="区域一" value="shanghai"></el-option>
+                                          <el-option label="区域二" value="beijing"></el-option></el-select></el-form-item>
+                                 <el-form-item label="时间" prop="alterTime">
                                  <el-date-picker
-                                      style="width: 280px"
                                       v-model="formInline.alterTime"
-                                      format="yyyy-MM-dd HH:mm:ss"
+                                      style="width:260px"
+                                      format="yyyy-MM-dd"
                                       type="daterange"
                                       range-separator="至"
                                       start-placeholder="开始日期"
-                                      end-placeholder="结束日期"></el-date-picker> </el-form-item></el-col>
-                        <el-col :span="4">
-                                <el-form-item label="报警类型">
-                                <el-select v-model="formInline.type" style="width: 160px">
+                                      end-placeholder="结束日期"></el-date-picker> </el-form-item>
+                                <el-form-item label="告警分型" prop="statusName">
+                                <el-select v-model="formInline.statusName">
                                           <el-option label="区域一" value="shanghai"></el-option>
-                                          <el-option label="区域二" value="beijing"></el-option></el-select></el-form-item></el-col>
-                        <el-col :span="4">
-                                <el-form-item label="处理状态">
-                                <el-select v-model="formInline.status" style="width: 160px">
+                                          <el-option label="区域二" value="beijing"></el-option></el-select></el-form-item>
+                                <el-form-item label="告警等级" prop="statusName">
+                                <el-select v-model="formInline.statusName">
                                           <el-option label="区域一" value="shanghai"></el-option>
-                                          <el-option label="区域二" value="beijing"></el-option></el-select></el-form-item></el-col>
-                        <el-col :span="4">
-                          <el-button type="primary" @click="queryList">搜索</el-button>
-                          <el-button @click="onSubmit">导出</el-button></el-col></el-row></el-form>
+                                          <el-option label="区域二" value="beijing"></el-option></el-select></el-form-item>
+                                <el-form-item label="处理状态" prop="alterTime">
+                                <el-select v-model="formInline.alterTime">
+                                          <el-option label="区域一" value="shanghai"></el-option>
+                                          <el-option label="区域二" value="beijing"></el-option></el-select></el-form-item>
+                          <el-button type="primary" @click="queryList">查询</el-button>
+                          <el-button type="primary" @click="reset('ruleForm')">重置</el-button></el-form>
+                        <div class="add">
+                          <el-button type="primary" @click="allHandle">批量处理</el-button>
+                          </div>
+                          
         <tableCom :table-data="tableData"
                   :column-data="tbColumnCon"
-                  style="width: 80%"
                   :current.sync="pagination.current"
                   :size.sync="pagination.size"
                   :total-count="pagination.totalCount"
                   :columnCheck="true"
                   :show-pagination="true"
-                  @query-data="queryList"
-                  :sortable="true">
-                  <el-table-column slot="column9"
+                  @query-data="queryList">
+                  <el-table-column slot="column14"
                                   slot-scope="row"
                                   :label="row.title"
                                   :width="row.width"
                                   :min-width="row.minWidth"
-                                  sortable>
+                                  :fixed="row.fixed">
                   <template slot-scope="scoped">
                     <div class="operation">
-                      <p @click="openhandle(scoped.row)">报警处理</p>
-                      <p>派遣工单</p>
-                      <p>监控画面</p>
+                      <p @click="jumpDetails(scoped.row)">告警详情</p>
                     </div></template></el-table-column></tableCom>
-      <handle-modal ref="handleModal" @confirm="confirm"></handle-modal>
-      <relation-modal></relation-modal>
+      <!--模态框--->
+      <div>
+        <batchHandle ref="batchHandle" ></batchHandle>
+      </div>
   </div>
 </template>
 
@@ -60,15 +66,13 @@
 import tableCom from "@/components/tableCom";
 import moment from "moment";
 import { productionAlerts,handleResults } from "@/api/modules/productionMonitoring";
-import handleModal from "../../../components/handleModal";
-import relationModal from "../../../components/relationModal.vue";
+import batchHandle from "@/views/monitor/components/params/batchHandle";
 import { tbColumnCon } from "../list/config";
 export default {
   name: "ProductionWarning",
   components: {
     tableCom,
-    handleModal,
-    relationModal,
+    batchHandle
   },
   data() {
     return {
@@ -96,19 +100,39 @@ export default {
     this.queryList();
   },
   methods: {
-    onSubmit() {
-      console.log("submit!");
+    /**
+     * @description:重置
+     * @param {*}
+     * @return {*}
+     */
+    reset(formName) {
+      this.$refs[formName].resetFields();
+      // console.log("submit!");
+      // this.$router.push({
+      //   name:'parameterDetails'
+      // })
     },
-    formatter(row, column) {
-      return row.address;
+    /**
+     * @description:告警详情
+     * @param {*}
+     * @return {*}
+     */
+    jumpDetails(row) {
+      this.$router.push({
+        name:'parameterDetails',
+        query:{
+          id:row.id,
+          status:row.status,
+        }
+      })
     },
-    //报警类型处理
-    openhandle (data) {
-      this.$refs.handleModal.show(data);
-    },
-    //告警处理
-    async confirm (data) {
-       let res = await handleResults(data);
+    /**
+     * @description:告警详情
+     * @param {*}
+     * @return {*}
+     */
+    allHandle() {
+      this.$refs.batchHandle.show();
     },
     //查询列表
     async queryList() {
@@ -119,10 +143,10 @@ export default {
       };
       if (params.alterTime) {
         params.alertStartTime = moment(params.alterTime[0]).format(
-          "YYYY-MM-DD HH:mm:ss"
+          "YYYY-MM-DD"
         );
         params.alertEndTime = moment(params.alterTime[1]).format(
-          "YYYY-MM-DD HH:mm:ss"
+          "YYYY-MM-DD"
         );
       } else {
         params.alertStartTime = "";
@@ -130,7 +154,7 @@ export default {
       }
       let res = await productionAlerts(params);
       this.tableData = res.data.content || [];
-      this.pagination.totalCount = res.data.totalPages;
+      this.pagination.totalCount = Number(res.data.totalElements) || 0;
     }
 
   },
@@ -140,8 +164,11 @@ export default {
 <style lang="less" scoped>
 .productionWarning {
   min-width: calc(100vh - 300px);
-  min-width: 1440px;
+  padding-right: 30px;
   padding-left: 30px;
+  .flex-warp{
+    flex-wrap: wrap;
+  }
   .form {
     padding-top: 30px;
   }
@@ -151,6 +178,11 @@ export default {
     p{
       margin-right: 10px;
     }
+  
+  }
+  .add{
+    margin-bottom: 30px;
+    margin-top: 10px;
   }
 }
 </style>

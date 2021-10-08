@@ -41,7 +41,6 @@
       </template>
       <sidebar-item
         v-for="child in item.children"
-        v-if="child.meta.menuName"
         :key="child.path"
         :is-nest="true"
         :item="child"

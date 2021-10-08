@@ -15,7 +15,6 @@
                           <el-button @click="onSubmit">新增</el-button></el-col></el-row></el-form>
         <tableCom :table-data="tableData"
                   :column-data="tbColumnCon"
-                  style="width: 40%"
                   :current.sync="pagination.current"
                   :size.sync="pagination.size"
                   :total-count="pagination.totalCount"
@@ -121,7 +120,7 @@ export default {
 <style lang="less" scoped>
 .productionWarning {
   min-width: calc(100vh - 300px);
-  min-width: 1440px;
+  padding-right: 30px;
   padding-left: 30px;
   .form {
     padding-top: 30px;

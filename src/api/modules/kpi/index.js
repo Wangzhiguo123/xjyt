@@ -1,7 +1,7 @@
 /*
  * @Description: kpi模块
  * @Date: 2021-08-31 16:45:54
- * @LastEditTime: 2021-09-07 17:01:07
+ * @LastEditTime: 2021-09-15 17:43:15
  */
 import * as request from "@/api/index";
 const base1 = "/passkpi";
@@ -13,6 +13,10 @@ const base1 = "/passkpi";
 export function getModelList(param) {
   return request.get(`${base1}/v1/evaluationmodel/page`, param);
 }
+// 获取评价模型详情
+export function getModelDetail(param) {
+  return request.get(`${base1}/v1/evaluationmodel/getDetail/${param.id}`, param);
+}
 // 禁用启用模型
 export function setModelStatus({ id, code }) {
   return request.get(`${base1}/v1/evaluationmodel/setStatus/${id}/${code}`);
@@ -23,13 +27,16 @@ export function deleteModel(id) {
 }
 // 保存评价模型
 export function addCommentModel(param) {
-  return request.post(`${base1}/v1/evaluationmodel/insert`, param);
+  return request.post(`${base1}/v1/evaluationmodel/submit`, param);
 }
 // 发布评价模型
 export function publishCommentModel(id) {
   return request.get(`${base1}/v1/evaluationmodel/publish/${id}`);
 }
-
+// 获取检查单位列表
+export function getAssessCycleList(param) {
+  return request.get(`${base1}/v1/evaluationmodel/cycle-select`, param);
+}
 // 获取指标列表树集合
 export function getModelExpressList(id) {
   return request.get(`${base1}/v1/modelMiddel/tree/${id}`);
@@ -50,7 +57,10 @@ export function deleteModelNode(id) {
 export function updateModelNode(param) {
   return request.post(`${base1}/v1/modelMiddel/update`, param);
 }
-
+// 更新权重、基础分
+export function updateBaseAndWeightScore(param) {
+  return request.post(`${base1}/v1/modelMiddel/saveScore`, param);
+}
 /**
  * 指标库管理
  */
@@ -107,6 +117,10 @@ export function getCommentDimensionSelect(param) {
 // 获取指标关联的对象级别
 export function getFormulaObjectSelect(param) {
   return request.get(`${base1}/v1/indexs/formula-object-select/${param}`);
+}
+// 获取指标公式配置的指标下拉列表
+export function getFormulaIndexSelect(param) {
+  return request.get(`${base1}/v1/indexs/formula-index-select/${param}`);
 }
 // 获取评价对象参数下拉
 export function getFormulaParamSelect() {
@@ -248,7 +262,7 @@ export function downloadGeologyTemplate() {
 }
 // 导出模板
 export function exportGeologyTemplate() {
-  return request.get(`${base1}/v1/linkgeology/import-excel`);
+  return request.get(`${base1}/v1/geology/export`);
 }
 
 /**\集输关系维度关联 */
@@ -267,4 +281,94 @@ export function updateTransportRelative(param) {
 // 下载导入模板
 export function downloadTransportTemplate() {
   return request.get(`${base1}/v1/gatherings/import-template`);
+}
+// 导出模板
+export function exportTransportTemplate() {
+  return request.get(`${base1}/v1/gatherings/export`);
+}
+
+/**
+ *
+ * @returns 评价管理
+ */
+// 获取指标评价模型列表
+export function getIndicatorAssessModelList(param) {
+  return request.get(`${base1}/v1/assess/model-select`, param);
+}
+// 获取检查单位列表
+export function getUnitlList(param) {
+  return request.get(`${base1}/v1/assess/unit-select`, param);
+}
+
+// 获取评价管理分页列表
+export function getAssessList(param) {
+  return request.get(`${base1}/v1/assess/page`, param);
+}
+// 删除模型
+export function deleteAssess(id) {
+  return request.deletefn(`${base1}/v1/assess/delete/${id}`);
+}
+// 获取创建人列表
+export function getCreateUserList(param) {
+  return request.get(`${base1}/v1/assess/user-select`, param);
+}
+// 获取评价对象树
+export function getObjectTree(param) {
+  return request.get(`${base1}/v1/assess/object-select`, param);
+}
+// 添加评价对象
+export function addAddObject(param) {
+  return request.post(`${base1}/v1/assess/add-object`, param);
+}
+// 删除评价对象
+export function removeObject(param) {
+  return request.post(`${base1}/v1/assess/remove-object`, param);
+}
+// 获取评价模型树
+export function getModelTree(param) {
+  return request.get(`${base1}/v1/assess/model-tree/${param.id}`, {});
+}
+// 获取评价管理详情
+export function getAssessDetail(param) {
+  return request.get(`${base1}/v1/assess/detail/${param.id}`, {});
+}
+// 更新评价分
+export function updateScore(param) {
+  return request.post(`${base1}/v1/assess/update/detail`, param);
+}
+// 创建评价管理
+export function createAssess(param) {
+  return request.post(`${base1}/v1/assess`, param);
+}
+// 编辑评价管理
+export function updateAssess(param) {
+  return request.post(`${base1}/v1/assess/update`, param);
+}
+// 确认评价
+export function confirmAssess(param) {
+  return request.get(`${base1}/v1/assess/confirm/${param.id}`, {});
+}
+/**
+ *
+ * @returns 评价结果
+ */
+// 获取评价结果列表
+export function getAssessResultList(param) {
+  return request.get(`${base1}/v1/assessDetail/page`, param);
+}
+// 导出评价结果
+export function exportAssessResult(param) {
+  return request.get(`${base1}/v1/assessDetail/export`, param);
+}
+// 获取指标下拉列表
+export function getIndexList(param) {
+  return request.get(`${base1}/v1/assessDetail/index-select`, param);
+}
+// 获取集输单元树
+export function getGatheringUnitTree(param) {
+  return request.get(`${base1}/v1/assessDetail/gathering-unit-tree`, param);
+}
+// 获取地质单元树
+export function getGeologyUnitTree(param) {
+  return request.get(`${base1}/v1/assessDetail/geology-unit-tree`, param);
 }

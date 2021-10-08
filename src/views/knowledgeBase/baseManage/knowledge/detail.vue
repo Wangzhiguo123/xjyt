@@ -221,13 +221,14 @@ export default {
         }
       }
       .introduction{
+        font-size: 16px;
         padding: 5px;
         background-color: #f0f2f5;
       }
       .body {
         padding-left: 0px;
         line-height: 24px;
-        font-size: 14px;
+        font-size: 16px;
         color: rgba(0, 0, 0, 0.85);
       }
     }

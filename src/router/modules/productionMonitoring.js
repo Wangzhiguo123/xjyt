@@ -35,6 +35,7 @@ export default [
           menuName: "生产监控告警管理",
           isMenu: true,
         },
+        redirect: "/parameterAlarm",
         component: () => import("@/views/monitor/productionWarning"),
         children: [
           {
@@ -45,17 +46,37 @@ export default [
               isMenu: true,
             },
             component: () =>
-              import("@/views/monitor/productionWarning/parameterAlarm/list"),
+              import("@/views/monitor/productionWarning/parameterAlarm/list"),  
           },
           {
-            path: "/productionWarning/faultAlarm",
+            path: "/productionWarning/parameterAlarm/details",
+            name: "parameterDetails",
+            meta: {
+              menuName: "参数告警详情",
+              isMenu: false,
+            },
+            component: () =>
+              import("@/views/monitor/productionWarning/parameterAlarm/details"),
+          },
+          {
+            path: "/faultAlarm",
             name: "faultAlarm",
             meta: {
               menuName: "故障告警",
               isMenu: true,
             },
             component: () =>
-              import("@/views/monitor/productionWarning/faultAlarm"),
+              import("@/views/monitor/productionWarning/faultAlarm/list"),
+          },
+          {
+            path: "/productionWarning/faultAlarm/details",
+            name: "parameterDetails",
+            meta: {
+              menuName: "故障告警详情",
+              isMenu: false,
+            },
+            component: () =>
+              import("@/views/monitor/productionWarning/faultAlarm/details"),
           },
           {
             path: "/productionWarning/warningType",
@@ -96,6 +117,39 @@ export default [
           isMenu: true,
         },
         component: () => import("@/views/monitor/videoSurveillance"),
+        redirect: "/videoSurveillance/basicsInfo",
+        children:[
+          {
+            path: "/videoSurveillance/basicsInfo",
+            name: "basicsInfo",
+            meta: {  
+              menuName: "视频监控告警管理",
+              isMenu: true,
+            },
+            component: () =>
+              import("@/views/monitor/videoSurveillance/basicsInfo/list"),
+          },
+          {
+            path: "/videoSurveillance/basicsInfo/details",
+            name: "basicsDetails",
+            meta: {  
+              menuName: "视频监控告警管理详情",
+              isMenu: false,
+            },
+            component: () =>
+              import("@/views/monitor/videoSurveillance/basicsInfo/details"),
+          },
+          {
+            path: "/videoSurveillance/paramInfo",
+            name: "paramInfo",
+            meta: {  
+              menuName: "视频监控参数管理",
+              isMenu: true,
+            },
+            component: () =>
+              import("@/views/monitor/videoSurveillance/paramInfo/list"),
+          },
+        ]
       },
       {
         path: "/runningVehicle",
@@ -105,7 +159,28 @@ export default [
           isMenu: true,
         },
         component: () => import("@/views/monitor/runningVehicle"),
+        redirect: "/runningVehicle/alarInfo",
         children:[
+          {
+            path: "/runningVehicle/alarInfo",
+            name: "alarInfo",
+            meta: {  
+              menuName: "车辆监控告警管理",
+              isMenu: true,
+            },
+            component: () =>
+              import("@/views/monitor/runningVehicle/alarInfo/list"),
+          },
+          {
+            path: "/runningVehicle/alarInfo/details",
+            name: "carAlarInfoDetails",
+            meta: {  
+              menuName: "车辆监控告警管理详情",
+              isMenu: false,
+            },
+            component: () =>
+              import("@/views/monitor/runningVehicle/alarInfo/details"),
+          },
           {
             path: "/runningVehicle/typeManagement",
             name: "typeManagement",
@@ -115,16 +190,6 @@ export default [
             },
             component: () =>
               import("@/views/monitor/runningVehicle/typeManagement/list"),
-          },
-          {
-            path: "/runningVehicle/alarInfo",
-            name: "alarInfo",
-            meta: {  
-              menuName: "车辆报警信息管理",
-              isMenu: true,
-            },
-            component: () =>
-              import("@/views/monitor/runningVehicle/alarInfo/list"),
           },
           {
             path: "/runningVehicle/basicsInfo",
@@ -174,6 +239,36 @@ export default [
           isMenu: true,
         },
         component: () => import("@/views/monitor/alarmHistory"),
+      },
+      {
+        path: "/device",
+        name: "device",
+        meta: {
+          menuName: "设备管理",
+          isMenu: true,
+        },
+        component: () => import("@/views/monitor/device"),
+        children:[
+          {
+            path: "/device/camera",
+            name: "camera",
+            meta: {  
+              menuName: "摄像头",
+              isMenu: true,
+            },
+            component: () =>
+              import("@/views/monitor/device/camera/list"),
+          },
+        ]
+      },
+      {
+        path: "/dispatch",
+        name: "dispatch",
+        meta: {
+          menuName: "自动派单配置",
+          isMenu: true,
+        },
+        component: () => import("@/views/monitor/dispatch/list"),
       },
     ],
   },

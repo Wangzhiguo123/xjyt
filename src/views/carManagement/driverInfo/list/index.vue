@@ -5,7 +5,7 @@
                 <el-row> <el-col :span="4">
                          <el-form-item label="司机信息">
                          <el-input v-model="formInline.paramName"
-                                   style="width: 160px"/></el-form-item></el-col>
+                                   style="width: 150px"/></el-form-item></el-col>
                          <el-col :span="7"> 
                                  <el-form-item label="服务到期时间">
                                  <el-date-picker
@@ -18,20 +18,21 @@
                                       end-placeholder="结束日期"></el-date-picker> </el-form-item></el-col>
                         <el-col :span="4">
                                 <el-form-item label="司机类型">
-                                <el-select v-model="formInline.type" style="width: 160px">
+                                <el-select v-model="formInline.type" style="width: 150px">
                                           <el-option label="区域一" value="shanghai"></el-option>
                                           <el-option label="区域二" value="beijing"></el-option></el-select></el-form-item></el-col>
                         <el-col :span="4">
                                 <el-form-item label="处理状态">
-                                <el-select v-model="formInline.status" style="width: 160px">
+                                <el-select v-model="formInline.status" style="width: 150px">
                                           <el-option label="区域一" value="shanghai"></el-option>
                                           <el-option label="区域二" value="beijing"></el-option></el-select></el-form-item></el-col>
-                        <el-col :span="4">
+                        <el-col :span="3">
                           <el-button type="primary" @click="queryList">搜索</el-button>
                           <el-button type="primary" @click="queryList">重置</el-button></el-col></el-row>
                 <el-row>  <el-col :span="2">
-                          <el-button type="primary" @click="queryList">新增</el-button></el-col>
-               <el-col :span="2">
+                          <!-- <el-button type="primary" @click="queryList">新增</el-button> -->
+                          </el-col>
+               <el-col :span="2"  :push='1'>
                            <el-upload class="upload-demo"
                                       :action="carDriversImport"
                                       :on-preview="handlePreview"
@@ -39,12 +40,12 @@
                                        multiple
                                       :limit="3"
                                       :on-exceed="handleExceed"
-                                      :file-list="fileList">
+                                      :file-list="fileList"
+                                       accept=".xls,.xlsx">
                                       <el-button size="small" type="primary">导入</el-button></el-upload>
                                       </el-col> </el-row></el-form>
         <tableCom :table-data="tableData"
                   :column-data="tbColumnCon"
-                  style="width: 80%"
                   :current.sync="pagination.current"
                   :size.sync="pagination.size"
                   :total-count="pagination.totalCount"
@@ -165,7 +166,7 @@ export default {
       let res = await carDriversPage(params);
       console.log('res',res)
       this.tableData = res.data.content || [];
-      this.pagination.totalCount = Number(res.data.totalElements); 
+      this.pagination.totalCount = Number(res.data.totalElements) || 0; 
     }
 
   },
@@ -175,7 +176,7 @@ export default {
 <style lang="less" scoped>
 .productionWarning {
   min-width: calc(100vh - 300px);
-  min-width: 1440px;
+  padding-right: 30px;
   padding-left: 30px;
   .form {
     padding-top: 30px;
@@ -192,7 +193,7 @@ export default {
   .el-button--primary{
     width: 66px;
     height: 40px;
-    margin-left: -20px;
+    margin-left: -60px;
   }
 }
 </style>

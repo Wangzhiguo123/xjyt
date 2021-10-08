@@ -4,20 +4,25 @@
  * @LastEditTime: 2021-09-03 11:03:55
 -->
 <template>
-  <el-dialog :title="title" :visible="isShow" @close="close">
-    <el-form :model="form" :rules="formRules" ref="form">
+  <el-dialog
+    :title="title"
+    :visible="isShow"
+    :close-on-click-modal="false"
+    @close="close"
+  >
+    <el-form ref="form" :model="form" :rules="formRules">
       <el-form-item label="指标名称" label-width="120px" prop="name">
         <el-input
+          v-model="form.name"
           size="mini"
           style="width: 200px"
-          v-model="form.name"
           autocomplete="off"
           maxlength="15"
           placeholder="请输入指标名称"
         ></el-input>
       </el-form-item>
       <el-form-item label="指标类型" label-width="120px" prop="type">
-        <el-select size="mini" v-model="form.type" placeholder="请选择指标类型">
+        <el-select v-model="form.type" size="mini" placeholder="请选择指标类型">
           <el-option
             v-for="item in expressTypeSelect"
             :key="item.id"
@@ -51,9 +56,9 @@
         prop="assessObjectIds"
       >
         <el-cascader
-          size="mini"
-          v-model="form.assessObjectIds"
           :key="addKey"
+          v-model="form.assessObjectIds"
+          size="mini"
           :show-all-levels="false"
           :options="commentDimensionSelect"
           :props="
@@ -103,13 +108,6 @@ export default {
     },
     updateId: {
       type: String,
-    },
-  },
-  watch: {
-    async isShow() {
-      if (this.isShow && this.updateId) {
-        this.getExpressDetail();
-      }
     },
   },
   data() {
@@ -168,6 +166,17 @@ export default {
       commentDimensionSelect: [],
     };
   },
+  watch: {
+    async isShow() {
+      if (this.isShow && this.updateId) {
+        this.getExpressDetail();
+      }
+    },
+  },
+  created() {
+    this.getExpressTypeSelect();
+    this.getCommentLevelSelect();
+  },
   methods: {
     /**
      * @description: 获取详情
@@ -177,7 +186,10 @@ export default {
       let { data } = await getExpressDetail(this.updateId);
       if (data.code === undefined) {
         this.form = JSON.parse(JSON.stringify(data));
-        this.getCommentDimensionSelect(data.assessObjectLevel);
+        this.form.assessObjectIds = this.form.assessCacheObjectIds
+          ? JSON.parse(this.form.assessCacheObjectIds)
+          : this.form.assessObjectIds;
+        this.getCommentDimensionSelect(data.assessObjectLevel, true);
       }
     },
     /**
@@ -204,12 +216,23 @@ export default {
      * @description: 获取评价对象维度下拉
      * @param {*}
      */
-    async getCommentDimensionSelect(id) {
+    async getCommentDimensionSelect(id, isOnload) {
       this.addKey++;
       let { data } = await getCommentDimensionSelect({
         code: id,
       });
       if (data.code === undefined) {
+        if (!isOnload) {
+          this.form.assessObjectIds = [];
+        }
+        // const arr = [
+        //     ['228476807467372544'],
+        //     ['228476807467372544', '228477067220619264'],
+        //     ['228476807467372544', '228477067220619264', '228477093397270528'],
+        //     ['228572372645580800'],
+        //     ['228572372645580800', '230725102445137920'],
+        //     ['228572453734060032']]
+        // this.form.assessObjectIds = arr
         this.commentDimensionSelect = [...data];
       }
     },
@@ -220,7 +243,25 @@ export default {
     confirm() {
       this.$refs.form.validate((valid) => {
         if (valid) {
-          this.$emit("confirm", this.form);
+          //组织机构类型会导致数据变成数组的数组字符串格式，需要剔除多余的数组格式
+          // console.log(this.form.assessObjectIds, 2222222);
+          // return;
+          let formatArr = [];
+          if (this.form.assessObjectLevel == "organization") {
+            formatArr = this.form.assessObjectIds.map((x) => {
+              if (Array.isArray(x)) {
+                return x[x.length - 1];
+              }
+              return x;
+            });
+          } else {
+            formatArr = this.form.assessObjectIds;
+          }
+          this.$emit("confirm", {
+            ...this.form,
+            assessCacheObjectIds: JSON.stringify(this.form.assessObjectIds),
+            assessObjectIds: formatArr,
+          });
         }
       });
     },
@@ -239,10 +280,6 @@ export default {
       this.$refs.form.resetFields();
       this.$emit("update:isShow", false);
     },
-  },
-  created() {
-    this.getExpressTypeSelect();
-    this.getCommentLevelSelect();
   },
 };
 </script>

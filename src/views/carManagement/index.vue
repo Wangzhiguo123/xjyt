@@ -18,7 +18,6 @@ export default {
 <style lang="less" scoped>
 .carManagement {
   height: 100%;
-  min-width: 1160px;
-  
+  width: 100%;
 }
 </style>

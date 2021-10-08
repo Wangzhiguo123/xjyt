@@ -6,22 +6,22 @@
 <template>
   <div class="container">
     <el-input
-      style="width: 300px; margin-right: 10px"
       v-model="listQuery.name"
+      style="width: 300px; margin-right: 10px"
       clearable
-      size="mini"
-      placeholder="请输入指标名称"
+      placeholder="请输入评价模型名称"
     ></el-input>
-    <el-button type="primary" size="mini" @click="getModelList">查询</el-button>
+    <el-button type="primary" @click="search">查询</el-button>
     <div style="margin-top: 10px">
-      <el-button type="primary" size="mini" @click="btnAdd">新增</el-button>
+      <el-button type="primary" @click="btnAdd">新增</el-button>
     </div>
     <v-table
       style="margin-top: 15px"
       :loading="loading"
       :table-data="tableData"
       :column-data="columnData"
-      :current.sync="listQuery.page"
+      :current.sync="listQuery.current"
+      :size.sync="listQuery.size"
       :total-count="total"
       :show-pagination="true"
       :auto-query-first="false"
@@ -48,23 +48,19 @@
       >
         <template slot-scope="scoped">
           <template v-if="scoped.row.publicName !== '已发布'">
-            <el-button size="mini" type="text" @click="handleEdit(scope.row)"
+            <el-button type="text" @click="handleEdit(scoped.row.id)"
               >编辑</el-button
             >
             <el-button
-              size="mini"
               type="text"
-              @click="handleDelete(scope.row.id)"
+              style="color: #eb4f1a"
+              @click="handleDelete(scoped.row.id)"
               >删除</el-button
             >
           </template>
-          <el-button
-            v-else
-            size="mini"
-            type="text"
-            @click="handleSetStatus(scoped.row)"
-            >{{ scoped.row.statusName === "禁用" ? "启用" : "禁用" }}</el-button
-          >
+          <el-button v-else type="text" @click="handleSetStatus(scoped.row)">{{
+            scoped.row.statusName === "" || scoped.row.statusName === "禁用" ? "启用" : "禁用"
+          }}</el-button>
         </template>
       </el-table-column>
     </v-table>
@@ -74,13 +70,7 @@
 <script>
 import VTable from "@/components/tableCom";
 
-import {
-  getModelList,
-  setModelStatus,
-  addBusiness,
-  updateBusiness,
-  deleteModel,
-} from "@/api/modules/kpi";
+import { getModelList, setModelStatus, deleteModel } from "@/api/modules/kpi";
 
 export default {
   components: {
@@ -146,19 +136,32 @@ export default {
       // 入参
       listQuery: {
         name: "",
-        page: 1,
+        current: 1,
         size: 10,
       },
     };
   },
+  created() {
+    this.getModelList();
+  },
   methods: {
+    search() {
+      this.listQuery.current = 1;
+      this.listQuery.size = 10;
+      this.getModelList();
+    },
     /**
      * @description: 获取列表数据
      * @param {*}
      */
     async getModelList() {
-      let { data } = await getModelList(this.listQuery);
+      this.loading = true;
+      let { data } = await getModelList({
+        ...this.listQuery,
+        current: this.listQuery.current - 1,
+      });
       if (data.code === undefined) {
+        this.loading = false;
         this.tableData = data.content;
         this.total = Number(data.totalElements);
       }
@@ -185,7 +188,7 @@ export default {
      * @description: 编辑数据
      * @param {*}
      */
-    handleEdit(row) {
+    handleEdit(id) {
       this.$router.push({
         path: `/model-edit/${id}`,
       });
@@ -228,9 +231,6 @@ export default {
         }
       });
     },
-  },
-  created() {
-    this.getModelList();
   },
 };
 </script>

@@ -1,7 +1,7 @@
 <!--
  * @Description: 组织机构维度关联
  * @Date: 2021-08-31 15:10:20
- * @LastEditTime: 2021-09-02 10:27:01
+ * @LastEditTime: 2021-09-15 17:41:57
 -->
 <template>
   <div class="container">
@@ -11,10 +11,12 @@
     <el-button type="primary" plain size="mini" @click="exportTemplate">导出</el-button>
     <el-table
       :data="tableData"
-      style="margin-top: 20px"
+      style="margin-top: 20px; min-height: 300px"
       row-key="id"
       border
       v-loading="loading"
+      :header-cell-style="{ background: '#F7F7F8', color: 'rgba(0,0,0,0.45)' }"
+      :cell-style="{ color: 'rgba(0,0,0,0.85)' }"
     >
       <el-table-column prop="name" label="组织机构名称"> </el-table-column>
       <el-table-column prop="levelId" label="组织机构级别维护">
@@ -23,6 +25,7 @@
             v-model="scoped.row.levelId"
             :options="levelSelectList"
             :show-all-levels="false"
+            :props="{ checkStrictly: true }"
             @change="handleChange($event, scoped.row)"
           ></el-cascader>
         </template>
@@ -66,12 +69,12 @@ export default {
      * @param {*}
      */
     async getOrganizaRelativeList() {
-      this.loading = true;
+      // this.loading = true;
       let { data } = await getOrganizaRelativeList();
+      // this.loading = false;
       if (data.code === undefined) {
         this.tableData = [...data];
       }
-      this.loading = false;
     },
     /**
      * @description: 级别选择
@@ -89,7 +92,7 @@ export default {
             linkId: row.linkId,
           });
       if (data.code === undefined) {
-        this.getOrganizaRelativeList();
+        // this.getOrganizaRelativeList();
         this.$message({
           type: "success",
           message: "编辑成功",
@@ -105,7 +108,7 @@ export default {
       downloadFile(response);
     },
     /**
-     * @description: 下载导入模板
+     * @description: 导出模板
      * @param {*}
      */
     async exportTemplate() {
@@ -119,4 +122,8 @@ export default {
   },
 };
 </script>
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+  .container {
+    padding: 40px;
+  }
+</style>

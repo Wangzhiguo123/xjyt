@@ -75,7 +75,8 @@ module.exports = {
         },
       },
       "/passsystem": {
-        target: "http://192.168.7.162:18100",
+        // target: "http://pss-system-test.cddev.cddpi.com",
+        target: "http://192.168.16.75:18100",
         changeOrigin: true,
         ws: true,
         pathRewrite: {
@@ -83,8 +84,8 @@ module.exports = {
         },
       },
       "/passknowledge": {
-        // target: "http://192.168.6.150:18098",
-        target: "http://pss-knowledge-test.cddev.cddpi.com",
+        target: "http://192.168.6.156:18098",
+        // target: "http://pss-knowledge-test.cddev.cddpi.com",
         changeOrigin: true,
         pathRewrite: {
           "^/passknowledge": "",
@@ -99,7 +100,9 @@ module.exports = {
       },
       //ceshi
       "/paramAlerts": {
-        target: "http://192.168.16.35:18103",
+        target: "http://192.168.16.75:18103",
+        // target: "http://192.168.16.108:18103",
+        // target: "http://pss-monitor-production.cddev.cddpi.com",
         changeOrigin: true,
         pathRewrite: {
           "^/paramAlerts": "",
@@ -107,7 +110,8 @@ module.exports = {
       },
       //监控
       "/bese": {
-        target: "http://192.168.16.35:18080",
+        // target: "http://192.168.16.35:18080",
+        target: "http://pss-base.cddev.cddpi.com",
         changeOrigin: true,
         pathRewrite: {
           "^/bese": "",
@@ -121,6 +125,8 @@ module.exports = {
         },
       },
       "/passkpi": {
+        // target: "http://pss.zonglie.work",
+        // target: "http://pss-kpi.cddev.cddpi.com",
         target: "http://192.168.16.68:18090",
         // target: "http://192.168.7.162:18090",
         changeOrigin: true,
@@ -138,7 +144,7 @@ module.exports = {
       // 车辆管理
       "/vehicle": {
         // target: "http://192.168.16.75:18080/",
-        target: "http://192.168.16.35:18080/",
+        target: "http://pss-base.cddev.cddpi.com",
         changeOrigin: true,
         pathRewrite: {
           "^/vehicle": "",
@@ -146,11 +152,22 @@ module.exports = {
       },
       //车辆监控报警模块
       "/carWarning": { 
-        // target: "http://192.168.16.75:18094",
-        target: "http://192.168.16.75:18094/",
+        target: "http://192.168.16.75:18094",
+        // target: "http://192.168.16.108:18094",
+        // target: "http://pss-monitor-car.cddev.cddpi.com",
         changeOrigin: true,
         pathRewrite: {
           "^/carWarning": "",
+        },
+      },
+      //视频告警模块
+      "/video": {  
+        target: "http://192.168.16.75:18201",
+        // target: "http://192.168.16.108:18201",
+        // target: "http://pss-monitor-car.cddev.cddpi.com",
+        changeOrigin: true,
+        pathRewrite: {
+          "^/video": "",
         },
       },
       "/annuaPlan": {

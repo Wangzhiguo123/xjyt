@@ -8,244 +8,264 @@
     <el-form :inline="true" :model="formParams" class="demo-form-inline">
       <el-form-item label="评价标题">
         <el-input
-          size="mini"
           v-model="formParams.title"
           clearable
-          placeholder="审批人"
+          placeholder="请输入评价标题"
         ></el-input>
       </el-form-item>
       <el-form-item label="指标评价模型名称">
         <el-select
-          size="mini"
-          v-model="formParams.labelIdList"
+          v-model="formParams.modelId"
           placeholder="请选择"
           clearable
           multiple
-          :multiple-limit="3"
+          filterable
+          :multiple-limit="1"
           collapse-tags
         >
           <el-option
-            v-for="item in labelList"
-            :key="item.labelId"
-            :label="item.labelName"
-            :value="item.labelId"
+            v-for="item in assessList"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
           ></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="检查单位">
-        <el-select
-          size="mini"
-          v-model="formParams.classificationIdList"
-          placeholder="请选择"
-          clearable
-          multiple
-          collapse-tags
-          :multiple-limit="1"
-        >
-          <el-option
-            v-for="item in classifyList"
-            :key="item.classificationId"
-            :label="item.classificationName"
-            :value="item.classificationId"
-          ></el-option>
-        </el-select>
+        <select-tree
+          v-model="formParams.orgUnitId"
+          :unit-tree="unitTree"
+        ></select-tree>
       </el-form-item>
       <el-form-item label="评价周期">
         <el-select
-          size="mini"
-          v-model="formParams.authorIdList"
+          v-model="formParams.cycle"
           placeholder="请选择"
           clearable
           multiple
+          filterable
           :multiple-limit="1"
           collapse-tags
+          @change="changeCycle"
         >
           <el-option
-            v-for="item in authorList"
-            :key="item.authorId"
-            :label="item.authorName"
-            :value="item.authorId"
-          ></el-option>
+            v-for="item in assessCycleList"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          >
+          </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="评价日期">
-        <el-date-picker
-          size="mini"
-          v-model="formDate"
-          type="daterange"
-          value-format="yyyy-MM-dd"
-          format="yyyy-MM-dd"
-          clearable
-          range-separator="至"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-          @change="onDateChange"
-        >
-        </el-date-picker>
+      <el-form-item v-if="formParams.cycle.length > 0" label="评价日期">
+        <div v-if="formParams.cycle[0] === 'year'">
+          <el-date-picker
+            v-model="assessmodel.year.begin"
+            type="year"
+            placeholder="选择年"
+          >
+          </el-date-picker
+          >&nbsp;至&nbsp;
+          <el-date-picker
+            v-model="assessmodel.year.end"
+            type="year"
+            placeholder="选择年"
+          >
+          </el-date-picker>
+        </div>
+        <div v-if="formParams.cycle[0] === 'quarter'">
+          <quarter-data-picker
+            v-model="assessmodel.quarter.begin"
+          ></quarter-data-picker>
+          至&nbsp;
+          <quarter-data-picker
+            v-model="assessmodel.quarter.end"
+          ></quarter-data-picker>
+        </div>
+        <div v-if="formParams.cycle[0] === 'month'">
+          <el-date-picker
+            v-model="assessmodel.month.begin"
+            type="month"
+            placeholder="选择月"
+          >
+          </el-date-picker
+          >&nbsp;至&nbsp;
+          <el-date-picker
+            v-model="assessmodel.month.end"
+            type="month"
+            placeholder="选择月"
+          >
+          </el-date-picker>
+        </div>
+        <div v-if="formParams.cycle[0] === 'day'">
+          <el-date-picker
+            v-model="assessmodel.date.begin"
+            type="date"
+            placeholder="选择日期"
+          >
+          </el-date-picker
+          >&nbsp;至&nbsp;
+          <el-date-picker
+            v-model="assessmodel.date.end"
+            type="date"
+            placeholder="选择日期"
+          >
+          </el-date-picker>
+        </div>
       </el-form-item>
 
       <el-form-item>
-        <el-button size="mini" type="primary" @click="getKnowledgeBaseList"
-          >查询</el-button
-        >
+        <el-button type="primary" @click="getKnowledgeBaseList">查询</el-button>
       </el-form-item>
       <el-form-item>
-        <el-button size="mini" type="primary" plain @click="onReset"
-          >重置</el-button
-        >
+        <el-button @click="reset">重置</el-button>
       </el-form-item>
     </el-form>
-    <el-button size="mini" type="primary" @click="handleAdd">新增</el-button>
+    <el-button type="primary" @click="handleAdd">新增</el-button>
 
     <v-table
       style="margin-top: 15px"
       :loading="loading"
       :table-data="tableData"
       :column-data="columnData"
-      :current.sync="listQuery.page"
+      :current.sync="listQuery.current"
+      :size.sync="listQuery.size"
       :total-count="total"
       :show-pagination="true"
       :auto-query-first="false"
-      @query-data="getBusinessList"
+      @query-data="getAssessList"
     >
       <el-table-column
-        slot="column10"
+        slot="column0"
         slot-scope="row"
         :label="row.title"
         :width="row.width"
-        fixed="right"
+      >
+        <template slot-scope="scoped">
+          <el-button type="text" @click="goToDetail(scoped.row)">{{
+            scoped.row.assessNumber
+          }}</el-button>
+        </template>
+      </el-table-column>
+      <el-table-column
+        slot="column11"
+        slot-scope="row"
+        :label="row.title"
+        :width="row.width"
       >
         <template slot-scope="scope">
-          <el-button size="mini" type="text" @click="handleEdit(scope.row)"
-            >编辑</el-button
-          >
-          <el-button size="mini" type="text" @click="handleDelete(scope.row)"
+          <el-button
+            v-if="scope.row.statusId !== 'confirm'"
+            type="text"
+            @click="handleEdit(scope.row)"
+            >编辑
+          </el-button>
+          <el-button
+            type="text"
+            style="color: #eb4f1a"
+            @click="handleDelete(scope.row)"
             >删除</el-button
           >
         </template>
       </el-table-column>
     </v-table>
-
-    <!-- 新增编辑弹窗 -->
-    <el-dialog
-      :title="dialogType === 'add' ? '新增' : '编辑'"
-      :visible.sync="isDialogShow"
-    >
-      <el-form :model="formParam" :rules="formRules" ref="formParam">
-        <el-form-item label="编号" label-width="120px" prop="code">
-          <el-input
-            v-model="formParam.code"
-            autocomplete="off"
-            size="mini"
-            placeholder="请输入编号"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="生产分类名称" label-width="120px" prop="name">
-          <el-input
-            v-model="formParam.name"
-            autocomplete="off"
-            size="mini"
-            placeholder="请输入名称"
-          ></el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="handleCancel" size="mini">取 消</el-button>
-        <el-button type="primary" @click="handleConfirm" size="mini"
-          >确 定</el-button
-        >
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
 import VTable from "@/components/tableCom";
+import QuarterDataPicker from "@/components/quarterDataPicker";
+import SelectTree from "@/components/selectTree";
 
 import {
-  getBusinessList,
-  addBusiness,
-  updateBusiness,
-  deleteBusiness,
+  getIndicatorAssessModelList,
+  getUnitlList,
+  getAssessCycleList,
+  getAssessList,
+  deleteAssess,
 } from "@/api/modules/kpi";
-import { validateTitle, validateNum } from "@/utils/validate";
-
+import { getDateArray } from "@/utils";
 export default {
   components: {
     VTable,
+    QuarterDataPicker,
+    SelectTree,
   },
   data() {
-    // 标题校验
-    const validateCode = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error("请输入编号"));
-      } else {
-        if (validateNum(value)) {
-          callback();
-        } else {
-          callback("编号只能为纯数字");
-        }
-      }
-    };
-    // 标题校验
-    const validateName = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error("请输入分类名称"));
-      } else {
-        if (validateTitle(value)) {
-          callback();
-        } else {
-          callback("名称输入格式不正确");
-        }
-      }
-    };
     return {
+      assessmodel: {
+        year: {
+          begin: "",
+          end: "",
+        },
+        quarter: {
+          begin: "",
+          end: "",
+        },
+        month: {
+          begin: "",
+          end: "",
+        },
+        date: {
+          begin: "",
+          end: "",
+        },
+      },
+      options: [],
+      unitTree: [],
+      formDate: [],
+      assessList: [],
+      classifyList: [],
+      assessCycleList: [],
       loading: false,
       tableData: [],
       columnData: [
         {
           title: "编号",
-          field: "code",
+          field: "assessNumber",
+          width: 120,
         },
         {
           title: "评价标题",
-          field: "name",
+          field: "title",
+          width: 150,
         },
         {
           title: "指标评价模型名称",
-          field: "",
+          field: "modelName",
         },
         {
           title: "状态",
-          field: "creationDate",
+          field: "statusName",
         },
         {
           title: "业务分类",
-          field: "creationDate",
+          field: "businessName",
         },
         {
           title: "场景分类",
-          field: "creationDate",
+          field: "sceneName",
         },
         {
           title: "评价周期",
-          field: "creationDate",
-        },
-        {
-          title: "检查单位",
-          field: "creationDate",
+          field: "cycleName",
         },
         {
           title: "评价日期",
-          field: "creationDate",
+          field: "assessDate",
         },
         {
+          title: "检查单位",
+          field: "orgUnitName",
+        },
+
+        {
           title: "创建人",
-          field: "creationDate",
+          field: "createUserName",
         },
         {
           title: "创建时间",
-          field: "creationDate",
+          field: "createTime",
         },
         {
           title: "操作",
@@ -257,74 +277,251 @@ export default {
 
       // 入参
       listQuery: {
-        page: 1,
+        current: 1,
         size: 10,
       },
 
-      isDialogShow: false,
       // 表格表头类型
-      dialogType: "add",
       formParams: {
-        code: "",
-        name: "",
-      },
-      formRules: {
-        code: [
-          {
-            required: true,
-            message: "请输入编号",
-            trigger: "blur",
-          },
-          {
-            validator: validateCode,
-            trigger: "blur",
-          },
-        ],
-        name: [
-          {
-            required: true,
-            message: "请输入名称",
-            trigger: "blur",
-          },
-          {
-            validator: validateName,
-            trigger: "blur",
-          },
-        ],
+        title: "",
+        modelId: [],
+        cycle: [],
+        orgUnitId: "",
       },
     };
   },
+  created() {
+    this.getIndicatorAssessModelList();
+    this.getUnitlList();
+    this.getAssessCycleList();
+    this.getAssessList();
+  },
   methods: {
-    /**
-     * @description: 获取列表数据
-     * @param {*}
-     */
-    async getBusinessList() {
-      let { data } = await getBusinessList(this.listQuery);
-      if (data.code === undefined) {
-        this.tableData = data;
-      }
+    reset() {
+      this.formParams = {
+        title: "",
+        modelId: [],
+        cycle: [],
+        orgUnitId: "",
+      };
+      this.listQuery = {
+        current: 1,
+        size: 10,
+      };
+      this.getAssessList();
     },
     /**
      * @description: 新增
      * @param {*}
      */
-    btnAdd() {
-      this.dialogType = "add";
-      this.isDialogShow = true;
+    handleAdd() {
+      this.$router.push({
+        path: "/comment-add",
+      });
     },
     /**
      * @description: 编辑数据
      * @param {*}
      */
     handleEdit(row) {
-      this.formParam = Object.assign(this.formParam, {
-        code: row.code,
-        name: row.name,
-        businessId: row.businessId,
+      this.$router.push({
+        path: `/comment-edit/${row.assessId}`,
       });
-      this.isDialogShow = true;
-      this.dialogType = "update";
+    },
+    /**
+     * @description: 跳转详情
+     * @param {*}
+     */
+    goToDetail(row) {
+      this.$router.push({
+        path: `/comment-detail/${row.assessId}`,
+      });
+    },
+    /**
+     * @description: 列表查询
+     * @param {*}
+     */
+    getKnowledgeBaseList() {
+      this.listQuery = {
+        current: 1,
+        size: 10,
+      };
+      this.getAssessList();
+    },
+    /**
+     * @description: 清空评价日期
+     * @param {*}
+     */
+    changeCycle() {
+      this.assessmodel.year.begin = "";
+      this.assessmodel.year.end = "";
+      this.assessmodel.quarter.begin = "";
+      this.assessmodel.quarter.end = "";
+      this.assessmodel.month.begin = "";
+      this.assessmodel.month.end = "";
+      this.assessmodel.date.begin = "";
+      this.assessmodel.date.end = "";
+    },
+    /**
+     * @description: 获取指标评价模型下拉
+     * @param {*}
+     */
+    async getIndicatorAssessModelList() {
+      let { data } = await getIndicatorAssessModelList();
+      if (data && data.code === undefined) {
+        this.assessList = data;
+      }
+    },
+    /**
+     * @description: 获取检查单位下拉
+     * @param {*}
+     */
+    async getUnitlList() {
+      let { data } = await getUnitlList();
+      if (data && data.code === undefined) {
+        this.unitTree = data;
+      }
+    },
+    /**
+     * @description: 获取评价周期下拉
+     * @param {*}
+     */
+    async getAssessCycleList() {
+      let { data } = await getAssessCycleList();
+      if (data && data.code === undefined) {
+        let arr = [{}, {}, {}, {}];
+        data.forEach((item) => {
+          if (item.id === "year") {
+            arr[0] = item;
+          } else if (item.id === "quarter") {
+            arr[1] = item;
+          } else if (item.id === "month") {
+            arr[2] = item;
+          } else {
+            arr[3] = item;
+          }
+        });
+        this.assessCycleList = arr;
+      }
+    },
+    /**
+     * @description: 日期改变
+     * @param {*}
+     */
+    onDateChange(val) {
+      if (val === null) {
+        this.formParams.publishDateStart = "";
+        this.formParams.publishDateEnd = "";
+      } else {
+        [this.formParams.publishDateStart, this.formParams.publishDateEnd] = [
+          ...val,
+        ];
+      }
+    },
+    /**
+     * @description: 获取列表数据
+     * @param {*}
+     */
+    async getAssessList() {
+      let param = {
+        title: this.formParams.title,
+        modelId: this.formParams.modelId[0],
+        cycle: this.formParams.cycle[0],
+        orgUnitId: this.formParams.orgUnitId,
+        ...this.listQuery,
+        current: this.listQuery.current - 1,
+      };
+      if (this.formParams.cycle.length > 0) {
+        let beginDate = "",
+          endDate = "";
+        switch (this.formParams.cycle[0]) {
+          case "year":
+            if (this.assessmodel.year.begin || this.assessmodel.year.end) {
+              if (this.assessmodel.year.begin && !this.assessmodel.year.end) {
+                this.assessmodel.year.end = this.assessmodel.year.begin;
+              } else if (
+                !this.assessmodel.year.begin &&
+                this.assessmodel.year.end
+              ) {
+                this.assessmodel.year.begin = this.assessmodel.year.end;
+              }
+              param["assessDates"] = `${
+                this.assessmodel.year.begin
+                  ? this.assessmodel.year.begin.getFullYear()
+                  : ""
+              },${
+                this.assessmodel.year.end
+                  ? this.assessmodel.year.end.getFullYear()
+                  : ""
+              }`;
+            }
+            break;
+          case "quarter":
+            if (
+              this.assessmodel.quarter.begin ||
+              this.assessmodel.quarter.end
+            ) {
+              if (
+                this.assessmodel.quarter.begin &&
+                !this.assessmodel.quarter.end
+              ) {
+                this.assessmodel.quarter.end = this.assessmodel.quarter.begin;
+              } else if (
+                !this.assessmodel.quarter.begin &&
+                this.assessmodel.quarter.end
+              ) {
+                this.assessmodel.quarter.begin = this.assessmodel.quarter.end;
+              }
+              param["assessDates"] = `${this.assessmodel.quarter.begin || ""},${
+                this.assessmodel.quarter.end || ""
+              }`;
+            }
+            break;
+          case "day":
+            if (this.assessmodel.date.begin || this.assessmodel.date.end) {
+              if (this.assessmodel.date.begin && !this.assessmodel.date.end) {
+                this.assessmodel.date.end = this.assessmodel.date.begin;
+              } else if (
+                !this.assessmodel.date.begin &&
+                this.assessmodel.date.end
+              ) {
+                this.assessmodel.date.begin = this.assessmodel.date.end;
+              }
+              let arrBeginDate = getDateArray(this.assessmodel.date.begin);
+              beginDate = `${arrBeginDate[0]}-${arrBeginDate[1]}-${arrBeginDate[2]}`;
+              let arrEndDate = getDateArray(this.assessmodel.date.end);
+              endDate = `${arrEndDate[0]}-${arrEndDate[1]}-${arrEndDate[2]}`;
+              param["assessDates"] = `${beginDate},${endDate}`;
+            }
+            break;
+          case "month":
+            if (this.assessmodel.month.begin || this.assessmodel.month.end) {
+              if (this.assessmodel.month.begin && !this.assessmodel.month.end) {
+                this.assessmodel.month.end = this.assessmodel.month.begin;
+              } else if (
+                !this.assessmodel.month.begin &&
+                this.assessmodel.month.end
+              ) {
+                this.assessmodel.month.begin = this.assessmodel.month.end;
+              }
+              let arrBeginDate = getDateArray(this.assessmodel.month.begin);
+              beginDate = `${arrBeginDate[0]}-${arrBeginDate[1]}`;
+              let arrEndDate = getDateArray(this.assessmodel.month.end);
+              endDate = `${arrEndDate[0]}-${arrEndDate[1]}`;
+              param["assessDates"] = `${beginDate},${endDate}`;
+            }
+            break;
+          default:
+            break;
+        }
+      }
+      this.loading = true;
+      let { data } = await getAssessList(param);
+      if (data.code === undefined) {
+        this.loading = false;
+        this.tableData = data.content;
+        this.total = Number(data.totalElements);
+      }
     },
     /**
      * @description: 删除
@@ -336,12 +533,10 @@ export default {
         cancelButtonText: "取消",
         type: "warning",
       }).then(async () => {
-        this.formParam = Object.assign(this.formParam, {
-          businessId: row.businessId,
-        });
-        let { data } = await deleteBusiness(this.formParam.businessId);
+        let { data } = await deleteAssess(row.assessId);
         if (data.code === undefined) {
-          this.getBusinessList();
+          this.listQuery.current = 1;
+          this.getAssessList();
           this.$message({
             type: "success",
             message: "删除成功",
@@ -349,43 +544,6 @@ export default {
         }
       });
     },
-    /**
-     * @description: 新增编辑确定
-     * @param {*}
-     */
-    handleConfirm() {
-      this.$refs.formParam.validate(async (valid) => {
-        if (valid) {
-          const apiArr = new Map([
-            ["add", addBusiness],
-            ["update", updateBusiness],
-          ]);
-          let { data } = await apiArr.get(this.dialogType)(this.formParam);
-          if (data.code === undefined) {
-            this.isDialogShow = false;
-            this.getBusinessList();
-            this.$message({
-              type: "success",
-              message: this.dialogType === "add" ? "新增成功" : "编辑成功",
-            });
-          }
-        }
-      });
-    },
-    /**
-     * @description: 取消
-     * @param {*}
-     */
-    handleCancel() {
-      this.isDialogShow = false;
-      this.formParam = {
-        code: "",
-        name: "",
-      };
-    },
-  },
-  created() {
-    this.getBusinessList();
   },
 };
 </script>

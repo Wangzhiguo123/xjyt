@@ -1,37 +1,30 @@
 <!-- 生产监控报警管理-车辆管理-车辆类型基础信息管理-列表 -->
 <template>
   <div class="productionWarning">
-       <el-form :model="formInline" class="form">
-                <el-row> <el-col :span="4">
+       <el-form :model="formInline" :inline="true" class="form">
                          <el-form-item label="报警信息">
                          <el-input v-model="formInline.paramName"
-                                   style="width: 160px"/></el-form-item></el-col>
-                         <el-col :span="7"> 
+                                   style="width: 160px"/></el-form-item>
                                  <el-form-item label="报警时间">
                                  <el-date-picker
-                                      style="width: 280px"
                                       v-model="formInline.alterTime"
                                       format="yyyy-MM-dd HH:mm:ss"
                                       type="daterange"
                                       range-separator="至"
                                       start-placeholder="开始日期"
-                                      end-placeholder="结束日期"></el-date-picker> </el-form-item></el-col>
-                        <el-col :span="4">
+                                      end-placeholder="结束日期"></el-date-picker></el-form-item>
                                 <el-form-item label="报警类型">
                                 <el-select v-model="formInline.type" style="width: 160px">
                                           <el-option label="区域一" value="shanghai"></el-option>
-                                          <el-option label="区域二" value="beijing"></el-option></el-select></el-form-item></el-col>
-                        <el-col :span="4">
+                                          <el-option label="区域二" value="beijing"></el-option></el-select></el-form-item>
                                 <el-form-item label="处理状态">
                                 <el-select v-model="formInline.status" style="width: 160px">
                                           <el-option label="区域一" value="shanghai"></el-option>
-                                          <el-option label="区域二" value="beijing"></el-option></el-select></el-form-item></el-col>
-                        <el-col :span="4">
-                          <el-button @click="queryList">搜索</el-button>
-                          <el-button @click="onSubmit">导出</el-button></el-col></el-row></el-form>
+                                          <el-option label="区域二" value="beijing"></el-option></el-select></el-form-item>
+                          <el-button type="primary" @click="queryList">搜索</el-button>
+                          <el-button @click="onSubmit">导出</el-button></el-form>
         <tableCom :table-data="tableData"
                   :column-data="tbColumnCon"
-                  style="width: 80%"
                   :current.sync="pagination.current"
                   :size.sync="pagination.size"
                   :total-count="pagination.totalCount"
@@ -48,9 +41,10 @@
                   <template slot-scope="scoped">
                     <div class="operation">
                       <p @click="openhandle(scoped.row)">报警类型</p>
-                      <p>派遣工单</p>
-                      <p>监控画面</p>
+                      <!-- <p>派遣工单</p>
+                      <p>监控画面</p> -->
                     </div></template></el-table-column></tableCom>
+                    <handle-modal ref="handleModal" @confirm="confirm"></handle-modal>
   </div>
 </template>
 
@@ -59,10 +53,12 @@ import tableCom from "@/components/tableCom";
 import moment from "moment";
 import { productionAlerts,handleResults } from "@/api/modules/productionMonitoring";
 import { tbColumnCon } from "./config";
+import handleModal from "../../../components/handleModal";
 export default {
   name: "ProductionWarning",
   components: {
     tableCom,
+    handleModal
   },
   data() {
     return {
@@ -124,7 +120,7 @@ export default {
       }
       let res = await productionAlerts(params);
       this.tableData = res.data.content || [];
-      this.pagination.totalCount = res.data.totalPages;
+      this.pagination.totalCount = Number(res.data.totalElements) || 0;;
     }
 
   },
@@ -134,7 +130,7 @@ export default {
 <style lang="less" scoped>
 .productionWarning {
   min-width: calc(100vh - 300px);
-  min-width: 1440px;
+  padding-right: 30px;
   padding-left: 30px;
   .form {
     padding-top: 30px;

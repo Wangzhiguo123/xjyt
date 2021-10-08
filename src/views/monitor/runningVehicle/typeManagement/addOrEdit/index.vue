@@ -10,7 +10,7 @@
     >
       <div class="content">
         <div style="margin: 20px"></div>
-        <el-form label-width="80px" :model="formInline" ref="formInline" :rules="rules">
+        <el-form label-width="140px" :model="formInline" ref="formInline" :rules="rules">
                  <el-form-item label="车辆告警类型" prop="name">
                                 <el-input v-model="formInline.name"/></el-form-item>
                  <el-form-item label="告警类型编码"  prop="code">
@@ -54,7 +54,7 @@ export default {
     //打开模态框
     show(data){
         if (data) {
-          this.title = '修改'
+          this.title = '编辑'
         } else {
           this.title = '新增'
         }

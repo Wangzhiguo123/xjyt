@@ -67,7 +67,7 @@ export default [
       },
 
       {
-        path: "/express-config/:id",
+        path: "/express-config/:id/:type",
         name: "expressConfig",
         meta: {
           menuName: "指标公式配置",
@@ -94,11 +94,23 @@ export default [
           isMenu: false,
           parentPath: '/comment-manage'
         },
-        component: () => import("@/views/kpiManage/commentManage"),
+        component: () => import("@/views/kpiManage/commentManage/edit"),
       },
       {
-        path: "/comment-detail",
+        path: "/comment-edit/:id",
+        name: "commentEdit",
+        props: true,
+        meta: {
+          menuName: "评价编辑",
+          isMenu: false,
+          parentPath: '/comment-manage'
+        },
+        component: () => import("@/views/kpiManage/commentManage/edit"),
+      },
+      {
+        path: "/comment-detail/:id",
         name: "commentDetail",
+        props: true,
         meta: {
           menuName: "评价详情",
           isMenu: false,

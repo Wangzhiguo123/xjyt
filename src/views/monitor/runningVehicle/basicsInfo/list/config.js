@@ -47,7 +47,6 @@ export const tbColumnCon = [
     {
       title: "操作",
       field: "",
-      width: '240',
       fixed:"right"
     },
   ]

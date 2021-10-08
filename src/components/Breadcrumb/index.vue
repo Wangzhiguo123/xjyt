@@ -15,6 +15,23 @@
         <a v-else @click.prevent="handleLink(item)">{{ item.meta.menuName }}</a>
       </el-breadcrumb-item>
     </transition-group>
+    <!-- <div v-if="selectShow" class="selectModel">
+      <el-select
+        v-model="value"
+        filterable
+        placeholder="请选择"
+        style="width: 160px"
+        class="selectInput"
+      >
+        <el-option
+          v-for="item in options"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        >
+        </el-option>
+      </el-select>
+    </div> -->
   </el-breadcrumb>
 </template>
 
@@ -23,10 +40,31 @@ export default {
   data() {
     return {
       levelList: null,
+      // options: [
+      //   {
+      //     value: "选项1",
+      //     label: "采气一场",
+      //   },
+      //   {
+      //     value: "选项2",
+      //     label: "百口泉采气厂",
+      //   },
+      //   {
+      //     value: "选项3",
+      //     label: "采气二场",
+      //   },
+      // ], //告警地图下拉框
+      // value: "", //下拉框参数
+      selectShow: false, //是否展示下拉框
     };
   },
   watch: {
     $route(route) {
+      if (route.path === '/alarmMap') { //判断是否告警地图
+        this.selectShow = true;
+      } else {
+        this.selectShow = false;
+      }
       if (route.path.startsWith("/redirect/")) {
         return;
       }
@@ -103,11 +141,15 @@ export default {
   background-color: #fff;
   z-index: 10;
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.05);
-
+  position: relative;
   .no-redirect {
     color: rgba(0, 0, 0, 0.85);
 
     cursor: text;
+  }
+  .selectModel {
+    position: absolute;
+    right: 300px;
   }
 }
 </style>

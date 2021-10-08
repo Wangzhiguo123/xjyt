@@ -21,6 +21,8 @@ import productionMonitoring from "./modules/productionMonitoring";
 import carManagement from "./modules/carManagement";
 import flightManagement from "./modules/flightManagement";
 import kpi from "./modules/kpi";
+import scheduling from "./modules/scheduling";
+import scheduemanage from "./modules/scheduemanage"
 Vue.use(VueRouter);
 
 // const modules = require.context("./", true, /\.js$/);
@@ -32,9 +34,11 @@ const routes = [
   ...knowledgeBase,
   ...operationAnalysis,
   ...productionMonitoring,
+  ...scheduling,
   ...carManagement,
   ...flightManagement,
   ...kpi,
+  ...scheduemanage
 ];
 
 const router = new VueRouter({

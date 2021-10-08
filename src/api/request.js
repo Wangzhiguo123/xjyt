@@ -14,6 +14,7 @@ axiosService.interceptors.request.use(
     // 移除代理字符串
     let reg = new RegExp(apiTarget.key);
     config.url = config.url.replace(reg, "");
+
     config.baseURL = apiTarget.env;
 
     // 可以在发送请求之前做些事情

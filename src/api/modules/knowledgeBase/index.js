@@ -85,7 +85,10 @@ export function delClassifies(param) {
 export function addClassify(param) {
   return request.post(`${base1}/v1/classification/AddClassification`, param);
 }
-
+// 编辑标签
+export function editClassify(param) {
+  return request.post(`${base1}/v1/classification/updateClassification`, param);
+}
 /**
  * 标签管理
  */
@@ -104,7 +107,10 @@ export function delLables(param) {
 export function addLabel(param) {
   return request.post(`${base1}/v1/label/addLabel`, param);
 }
-
+// 编辑标签
+export function editLabel(param) {
+  return request.post(`${base1}/v1/label/updateLabel`, param);
+}
 
 /**
  * 工单构建

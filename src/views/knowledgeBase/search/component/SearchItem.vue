@@ -12,11 +12,11 @@
       class="title"
       v-html="result.articleTitle"
     ></router-link>
-    <section class="content" v-html="result.articleContent"></section>
+    <section class="content" v-html="result.articleIntroduction"></section>
     <footer class="foot">
       <span class="item">作者：{{ result.createdByName }}</span>
       <span class="item"
-        >发布时间：{{ result.articlePublishDateTime.split(" ")[0] }}</span
+        >发布时间：{{ result.articlePublishDateTime }}</span
       >
     </footer>
   </div>
@@ -29,9 +29,9 @@ export default {
     },
   },
   computed: {
-    content() {
-      return this.result.articleContent.replace(/<[^<>]+>/g, "");
-    },
+    // content() {
+    //   return this.result.articleContent.replace(/<[^<>]+>/g, "");
+    // },
   },
 };
 </script>

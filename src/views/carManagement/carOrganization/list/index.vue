@@ -2,7 +2,7 @@
 <template>
   <div class="carOrganizes">
        <el-form :model="formInline" class="form">
-                <el-row> <el-col :span="4">
+                <el-row> <el-col :span="5">
                          <el-form-item label="车辆组织">
                             <el-input v-model="formInline.name"
                                       style="width: 160px"/></el-form-item></el-col>
@@ -15,7 +15,6 @@
                           <el-button @click="onSubmit">新增</el-button></el-col></el-row></el-form>
         <tableCom :table-data="tableData"
                   :column-data="tbColumnCon"
-                  style="width: 50%"
                   :current.sync="pagination.current"
                   :size.sync="pagination.size"
                   :total-count="pagination.totalCount"
@@ -111,7 +110,7 @@ export default {
       };
       let res = await carOrganizesPage(params);
       this.tableData = res.data.content || [];
-      this.pagination.totalCount = Number(res.data.totalElements);
+      this.pagination.totalCount = Number(res.data.totalElements) || 0;
     }
   },
 };
@@ -120,7 +119,7 @@ export default {
 <style lang="less" scoped>
 .carOrganizes {
   min-width: calc(100vh - 300px);
-  min-width: 1440px;
+  padding-right: 30px;
   padding-left: 30px;
   .form {
     padding-top: 30px;

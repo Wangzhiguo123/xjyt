@@ -2,20 +2,19 @@
 <template>
   <div class="carRelation">
        <el-form :model="formInline" class="form">
-                <el-row> <el-col :span="4">
+                <el-row> <el-col :span="5">
                          <el-form-item label="车辆类型">
                             <el-input v-model="formInline.name"
                                       style="width: 160px"/></el-form-item></el-col>
-                        <el-col :span="4">
+                        <el-col :span="5">
                             <el-form-item label="类型编码">
                             <el-input v-model="formInline.code"
                                       style="width: 160px"/></el-form-item></el-col>
-                        <el-col :span="4">
+                        <el-col :span="5">
                           <el-button type="primary" @click="queryList">搜索</el-button>
                           <el-button @click="onSubmit">新增</el-button></el-col></el-row></el-form>
         <tableCom :table-data="tableData"
                   :column-data="tbColumnCon"
-                  style="width: 40%"
                   :current.sync="pagination.current"
                   :size.sync="pagination.size"
                   :total-count="pagination.totalCount"
@@ -120,7 +119,7 @@ export default {
 <style lang="less" scoped>
 .carRelation {
   min-width: calc(100vh - 300px);
-  min-width: 1440px;
+  padding-right: 30px;
   padding-left: 30px;
   .form {
     padding-top: 30px;

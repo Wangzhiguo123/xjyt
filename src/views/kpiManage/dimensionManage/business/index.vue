@@ -5,13 +5,14 @@
 -->
 <template>
   <div class="container">
-    <el-button type="primary" size="mini" @click="btnAdd">新增</el-button>
+    <el-button type="primary" @click="btnAdd">新增</el-button>
     <v-table
       style="margin-top: 15px"
       :loading="loading"
       :table-data="tableData"
       :column-data="columnData"
       :current.sync="listQuery.page"
+      :size.sync="listQuery.size"
       :total-count="total"
       :show-pagination="false"
       :auto-query-first="false"
@@ -24,10 +25,11 @@
         :width="row.width"
       >
         <template slot-scope="scope">
-          <el-button size="mini" type="text" @click="handleEdit(scope.row)"
-            >编辑</el-button
-          >
-          <el-button size="mini" type="text" @click="handleDelete(scope.row)"
+          <el-button type="text" @click="handleEdit(scope.row)">编辑</el-button>
+          <el-button
+            style="color: #eb4f1a"
+            type="text"
+            @click="handleDelete(scope.row)"
             >删除</el-button
           >
         </template>
@@ -39,12 +41,11 @@
       :title="dialogType === 'add' ? '新增' : '编辑'"
       :visible.sync="isDialogShow"
     >
-      <el-form :model="formParam" :rules="formRules" ref="formParam">
+      <el-form ref="formParam" :model="formParam" :rules="formRules">
         <el-form-item label="编号" label-width="120px" prop="code">
           <el-input
             v-model="formParam.code"
             autocomplete="off"
-            size="mini"
             placeholder="请输入编号"
           ></el-input>
         </el-form-item>
@@ -52,14 +53,13 @@
           <el-input
             v-model="formParam.name"
             autocomplete="off"
-            size="mini"
             placeholder="请输入名称"
           ></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="handleCancel" size="mini">取 消</el-button>
-        <el-button type="primary" @click="handleConfirm" size="mini"
+        <el-button @click="handleCancel">取 消</el-button>
+        <el-button type="primary" @click="handleConfirm"
           >确 定</el-button
         >
       </div>
@@ -88,10 +88,11 @@ export default {
       if (!value) {
         return callback(new Error("请输入编号"));
       } else {
-        if (validateNum(value)) {
+        const reg = /^[a-zA-Z0-9]+$/;
+        if (reg.test(value)) {
           callback();
         } else {
-          callback("编号只能为纯数字");
+          callback("编号只能输入数字，字母");
         }
       }
     };
@@ -99,12 +100,14 @@ export default {
     const validateName = (rule, value, callback) => {
       if (!value) {
         return callback(new Error("请输入分类名称"));
+      }
+      if (!value.trim()) {
+        return callback(new Error("生产分类名称不能为纯空格"));
+      }
+      if (validateTitle(value)) {
+        callback();
       } else {
-        if (validateTitle(value)) {
-          callback();
-        } else {
-          callback("名称输入格式不正确");
-        }
+        callback("名称输入格式不正确");
       }
     };
     return {
@@ -174,6 +177,9 @@ export default {
       },
     };
   },
+  created() {
+    this.getBusinessList();
+  },
   methods: {
     /**
      * @description: 获取列表数据
@@ -192,6 +198,9 @@ export default {
     btnAdd() {
       this.dialogType = "add";
       this.isDialogShow = true;
+      this.$nextTick(()=>{
+        this.$refs.formParam.resetFields();
+      })
     },
     /**
      * @description: 编辑数据
@@ -243,7 +252,10 @@ export default {
           let { data } = await apiArr.get(this.dialogType)(this.formParam);
           if (data.code === undefined) {
             this.isDialogShow = false;
+
             this.getBusinessList();
+            this.formParam.code = "";
+            this.formParam.name = "";
             this.$message({
               type: "success",
               message: this.dialogType === "add" ? "新增成功" : "编辑成功",
@@ -257,15 +269,14 @@ export default {
      * @param {*}
      */
     handleCancel() {
+      this.$refs.formParam.clearValidate();
       this.isDialogShow = false;
+
       this.formParam = {
         code: "",
         name: "",
       };
     },
-  },
-  created() {
-    this.getBusinessList();
   },
 };
 </script>

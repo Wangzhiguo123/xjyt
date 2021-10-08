@@ -1,28 +1,34 @@
 <!--
  * @Description: 集输关系维度关联
  * @Date: 2021-08-31 15:10:20
- * @LastEditTime: 2021-09-02 09:29:09
+ * @LastEditTime: 2021-09-16 11:04:01
 -->
 <template>
   <div class="container">
-    <el-button type="primary" plain size="mini" @click="downloadTemplate"
+    <el-button type="primary" @click="downloadTemplate"
       >下载导入模板</el-button
     >
-    <el-button type="primary" plain size="mini">导出</el-button>
+    <el-button type="primary" @click="exportTemplate"
+      >导出</el-button
+    >
     <el-table
+      v-loading="loading"
       :data="tableData"
       style="margin-top: 20px"
       row-key="id"
       border
-      v-loading="loading"
+      :header-cell-style="{ background: '#F7F7F8', color: 'rgba(0,0,0,0.45)' }"
+      :cell-style="{ color: 'rgba(0,0,0,0.85)' }"
     >
       <el-table-column prop="name" label="集输单元名称"> </el-table-column>
-      <el-table-column prop="levelId" label="集输关系级别">
+      <el-table-column prop="gatheringId" label="集输关系级别">
         <template slot-scope="scoped">
           <el-cascader
-            v-model="scoped.row.levelId"
+            ref="casader"
+            v-model="scoped.row.gatheringId"
             :options="levelSelectList"
             :show-all-levels="false"
+            :props="{ checkStrictly: true }"
             @change="handleChange($event, scoped.row)"
           ></el-cascader>
         </template>
@@ -37,6 +43,7 @@ import {
   addTransportRelative,
   updateTransportRelative,
   downloadTransportTemplate,
+  exportTransportTemplate,
 } from "@/api/modules/kpi";
 
 import { downloadFile } from "@/utils";
@@ -48,6 +55,10 @@ export default {
       levelSelectList: [],
       tableData: [],
     };
+  },
+  created() {
+    this.getTransportRelativeList();
+    this.getTransportList();
   },
   methods: {
     /**
@@ -64,7 +75,7 @@ export default {
      * @description: 获取列表数据
      * @param {*}
      */
-    async getOrganizaRelativeList() {
+    async getTransportRelativeList() {
       this.loading = true;
       let { data } = await getTransportRelativeList();
       if (data.code === undefined) {
@@ -80,16 +91,18 @@ export default {
     async handleChange(res, row) {
       let { data } = !row.linkId
         ? await addTransportRelative({
-            levelId: row.levelId[row.levelId.length - 1],
+            gatheringId: row.gatheringId[row.gatheringId.length - 1],
             refId: row.id,
           })
         : await updateTransportRelative({
-            levelId: row.levelId[row.levelId.length - 1],
+            gatheringId: row.gatheringId[row.gatheringId.length - 1],
             linkId: row.linkId,
           });
       if (data.code === undefined) {
-        this.getTransportRelativeList();
-        this.$message({
+        // this.getTransportRelativeList();
+        // console.log(this.$refs, 222222);
+        // this.$refs["casader"].dropDownVisible = false;
+          this.$message({
           type: "success",
           message: "编辑成功",
         });
@@ -103,11 +116,19 @@ export default {
       let response = await downloadTransportTemplate();
       downloadFile(response);
     },
-  },
-  created() {
-    this.getTransportRelativeList();
-    this.getTransportList();
+    /**
+     * @description: 下载导入模板
+     * @param {*}
+     */
+    async exportTemplate() {
+      let response = await exportTransportTemplate();
+      downloadFile(response);
+    },
   },
 };
 </script>
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+  .container {
+    padding: 40px;
+  }
+</style>

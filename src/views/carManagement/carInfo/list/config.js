@@ -1,7 +1,7 @@
 export const tbColumnCon = [
     {
       title: "车牌颜色",
-      field: "licensePlateColorID",
+      field: "licensePlateColor",
       width: 120,
     },
     {
@@ -16,12 +16,12 @@ export const tbColumnCon = [
     },
     {
       title: "车辆运维状态",
-      field: "operationStatusId",
+      field: "operationStatus",
       width: 140,
     },
     {
       title: "所属组织",
-      field: "organizeId",
+      field: "organize",
       width: 120,
     },
     {
@@ -41,7 +41,7 @@ export const tbColumnCon = [
     },
     {
       title: "车辆类型",
-      field: "typeId",
+      field: "type",
       width: 120,
     },
     {

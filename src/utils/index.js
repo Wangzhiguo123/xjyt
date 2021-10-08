@@ -55,10 +55,13 @@ export function getQueryString() {
  */
 export function downloadFile(response) {
   const disposition = response.headers["content-disposition"];
-  let fileName = disposition.substring(
-    disposition.indexOf("filename=") + 9,
-    disposition.length
-  );
+  let fileName='';
+  if(disposition){
+    fileName = disposition.substring(
+      disposition.indexOf("filename=") + 9,
+      disposition.length
+    );
+  }
   fileName = decodeURI(escape(fileName));
   // 去掉双引号
   fileName = fileName.replace(/\"/g, "");
@@ -79,4 +82,37 @@ export function downloadFile(response) {
   // 释放URL 对象
   window.URL.revokeObjectURL(link.href);
   document.body.removeChild(link);
+}
+
+
+/**
+ * @description: 获取时间的年月日数组
+ * @param {*}
+ */
+ export function getDateArray(date) {
+    if(date&&date instanceof Date)
+    {
+      return [
+        date.getFullYear(),
+        (date.getMonth() + 1),
+        date.getDate()
+      ];
+    }
+    return [];
+}
+/**
+ * 
+ * @param {*} time 
+ * @param {*} isCompleteDate true 表示 时间格式为详细时间，带时分秒。 false 表示 简写时间，不带时分秒
+ */
+ export function GMTToStr(time, isCompleteDate = true) {
+  let date = new Date(time);
+  let Str = numberFormate(date.getFullYear()) + '-' + numberFormate(date.getMonth() + 1) + '-' + numberFormate(date.getDate());
+  if (isCompleteDate) {
+    Str += ' ' + numberFormate(date.getHours()) + ':' + numberFormate(date.getMinutes()) + ':' + numberFormate(date.getSeconds());
+  }
+  return Str;
+}
+function numberFormate(num) {
+  return `${num<10?'0':''}${num}`;
 }

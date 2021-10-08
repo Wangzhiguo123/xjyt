@@ -17,7 +17,6 @@ export default {
 <style lang="less" scoped>
 .monitor {
   height: 100%;
-  min-width: 1160PX;
-  
+  width: 100%;
 }
 </style>

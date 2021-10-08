@@ -1,7 +1,7 @@
 export const tbColumnCon = [
     {
       title: "驾驶车辆",
-      field: "carId",
+      field: "carNum",
       width: 120,
     },
     {
@@ -11,7 +11,7 @@ export const tbColumnCon = [
     },
     {
       title: "所属组织编码",
-      field: "organize",
+      field: "organizeName",
       width: 140,
     },
     {

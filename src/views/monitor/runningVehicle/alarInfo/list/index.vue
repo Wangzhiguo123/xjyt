@@ -1,60 +1,59 @@
-<!-- 生产监控报警管理-车辆管理-车辆类型报警信息管理-列表 -->
+<!-- 生产监控报警管理-车辆监控告警管理 -->
 <template>
   <div class="productionWarning">
-       <el-form :model="formInline" class="form">
-                <el-row> <el-col :span="5">
-                         <el-form-item label="报警信息">
-                         <el-input v-model="formInline.paramName"
-                                   style="width: 160px"/></el-form-item></el-col>
-                        <el-col :span="5">
-                                <el-form-item label="车牌号码">
-                                <el-select v-model="formInline.type" style="width: 160px">
+       <el-form :model="formInline" :inline="true" class="form" ref="ruleForm" label-width="80px">
+                        <el-form-item label="车牌号码" prop="type">
+                                  <el-select v-model="formInline.type">
+                                             <el-option label="区域一" value="shanghai"></el-option>
+                                             <el-option label="区域二" value="beijing"></el-option></el-select></el-form-item>
+                                <el-form-item label="机构区域" prop="alertTypeName">
+                                <el-select v-model="formInline.alertTypeName">
                                           <el-option label="区域一" value="shanghai"></el-option>
-                                          <el-option label="区域二" value="beijing"></el-option></el-select></el-form-item></el-col>
-                        <el-col :span="7"> 
-                                 <el-form-item label="报警时间">
+                                          <el-option label="区域二" value="beijing"></el-option></el-select></el-form-item> 
+                                 <el-form-item label="告警时间" prop="alterTime">
                                  <el-date-picker
-                                      style="width: 280px"
                                       v-model="formInline.alterTime"
-                                      format="yyyy-MM-dd HH:mm:ss"
+                                      style="width:260px"
+                                      format="yyyy-MM-dd"
                                       type="daterange"
                                       range-separator="至"
                                       start-placeholder="开始日期"
-                                      end-placeholder="结束日期"></el-date-picker> </el-form-item></el-col>
-                       <el-col :span="5">
-                                <el-form-item label="运营类型">
-                                <el-select v-model="formInline.type" style="width: 160px">
+                                      end-placeholder="结束日期"></el-date-picker> </el-form-item>
+                                <el-form-item label="告警类型" prop="statusName">
+                                <el-select v-model="formInline.statusName">
                                           <el-option label="区域一" value="shanghai"></el-option>
-                                          <el-option label="区域二" value="beijing"></el-option></el-select></el-form-item></el-col>
-                        <el-col :span="5">
-                                <el-form-item label="处理状态">
-                                <el-select v-model="formInline.status" style="width: 160px">
+                                          <el-option label="区域二" value="beijing"></el-option></el-select></el-form-item>
+                                <el-form-item label="运营类型" prop="statusName">
+                                <el-select v-model="formInline.statusName">
                                           <el-option label="区域一" value="shanghai"></el-option>
-                                          <el-option label="区域二" value="beijing"></el-option></el-select></el-form-item></el-col>
-                        <el-col :span="4">
-                          <el-button @click="queryList">搜索</el-button>
-                          <el-button @click="onSubmit">导出</el-button></el-col></el-row></el-form>
+                                          <el-option label="区域二" value="beijing"></el-option></el-select></el-form-item>
+                                <el-form-item label="处理状态" prop="statusName">
+                                <el-select v-model="formInline.statusName">
+                                          <el-option label="区域一" value="shanghai"></el-option>
+                                          <el-option label="区域二" value="beijing"></el-option></el-select></el-form-item>
+                                <el-form-item label="车辆状态" prop="statusName">
+                                <el-select v-model="formInline.statusName" style="width:260px">
+                                          <el-option label="区域一" value="shanghai"></el-option>
+                                          <el-option label="区域二" value="beijing"></el-option></el-select></el-form-item>
+                          <el-button type="primary" @click="queryList">查询</el-button>
+                          <el-button type="primary" @click="reset('ruleForm')">重置</el-button></el-form>
         <tableCom :table-data="tableData"
                   :column-data="tbColumnCon"
-                  style="width: 80%"
                   :current.sync="pagination.current"
                   :size.sync="pagination.size"
                   :total-count="pagination.totalCount"
                   :columnCheck="true"
                   :show-pagination="true"
-                  @query-data="queryList"
-                  :sortable="true">
-                  <el-table-column slot="column9"
+                  @query-data="queryList">
+                  <el-table-column slot="column8"
                                   slot-scope="row"
                                   :label="row.title"
                                   :width="row.width"
                                   :min-width="row.minWidth"
-                                  sortable>
+                                  :fixed="row.fixed">
                   <template slot-scope="scoped">
                     <div class="operation">
-                      <p @click="openhandle(scoped.row)">报警类型</p>
-                      <p>派遣工单</p>
-                      <p>监控画面</p>
+                      <p @click="jumpDetails(scoped.row)">告警详情</p>
                     </div></template></el-table-column></tableCom>
   </div>
 </template>
@@ -62,12 +61,12 @@
 <script>
 import tableCom from "@/components/tableCom";
 import moment from "moment";
-import { carAlertsPage,handleResults } from "@/api/modules/productionMonitoring";
-import { tbColumnCon } from "./config";
+import {  carAlertsPage } from "@/api/modules/productionMonitoring";
+import { tbColumnCon } from "../list/config";
 export default {
   name: "ProductionWarning",
   components: {
-    tableCom,
+    tableCom
   },
   data() {
     return {
@@ -95,19 +94,31 @@ export default {
     this.queryList();
   },
   methods: {
-    onSubmit() {
-      console.log("submit!");
+    /**
+     * @description:重置
+     * @param {*}
+     * @return {*}
+     */
+    reset(formName) {
+      this.$refs[formName].resetFields();
+      // console.log("submit!");
+      // this.$router.push({
+      //   name:'parameterDetails'
+      // })
     },
-    formatter(row, column) {
-      return row.address;
-    },
-    //报警类型处理
-    openhandle (data) {
-      this.$refs.handleModal.show(data);
-    },
-    //告警处理
-    async confirm (data) {
-       let res = await handleResults(data);
+    /**
+     * @description:告警详情
+     * @param {*}
+     * @return {*}
+     */
+    jumpDetails(row) {
+      this.$router.push({
+        name:'carAlarInfoDetails',
+        query:{
+          id:row.id,
+          status:row.status,
+        }
+      })
     },
     //查询列表
     async queryList() {
@@ -118,18 +129,18 @@ export default {
       };
       if (params.alterTime) {
         params.alertStartTime = moment(params.alterTime[0]).format(
-          "YYYY-MM-DD HH:mm:ss"
+          "YYYY-MM-DD"
         );
         params.alertEndTime = moment(params.alterTime[1]).format(
-          "YYYY-MM-DD HH:mm:ss"
+          "YYYY-MM-DD"
         );
       } else {
         params.alertStartTime = "";
         params.alertEndTime = "";
       }
-      let res = await carAlertsPage(params);
+      let res = await  carAlertsPage(params);
       this.tableData = res.data.content || [];
-      this.pagination.totalCount = res.data.totalPages;
+      this.pagination.totalCount = Number(res.data.totalElements) || 0;
     }
 
   },
@@ -139,8 +150,11 @@ export default {
 <style lang="less" scoped>
 .productionWarning {
   min-width: calc(100vh - 300px);
-  min-width: 1440px;
+  padding-right: 30px;
   padding-left: 30px;
+  .flex-warp{
+    flex-wrap: wrap;
+  }
   .form {
     padding-top: 30px;
   }
@@ -150,6 +164,11 @@ export default {
     p{
       margin-right: 10px;
     }
+  
+  }
+  .add{
+    margin-bottom: 30px;
+    margin-top: 10px;
   }
 }
 </style>

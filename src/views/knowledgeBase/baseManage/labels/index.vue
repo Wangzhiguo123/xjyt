@@ -77,6 +77,9 @@
           :width="row.width"
         >
           <template slot-scope="scope">
+            <el-button size="mini" type="text" @click="handleEdit(scope.row)"
+              >编辑</el-button
+            >
             <el-button
               size="mini"
               type="text"
@@ -94,7 +97,7 @@
 import NavBar from "../component/Nav";
 import VTable from "@/components/tableCom";
 
-import { getLableList, delLables, addLabel } from "@/api/modules/knowledgeBase";
+import { getLableList, delLables, addLabel, editLabel } from "@/api/modules/knowledgeBase";
 export default {
   components: {
     NavBar,
@@ -174,7 +177,7 @@ export default {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         inputPattern: /^[\u4e00-\u9fa5\da-zA-Z]{1,10}$/,
-        inputErrorMessage: "请输入标签内容且不能包含特殊字符",
+        inputErrorMessage: "请输入标签内容且不能包含特殊字符并不超过10个字符",
       })
         .then(async ({ value }) => {
           let { data } = await addLabel({
@@ -186,6 +189,35 @@ export default {
             this.$message({
               type: "success",
               message: "新增成功",
+            });
+          }
+        })
+        .catch(() => {});
+    },
+    /**
+     * @description: 编辑标签类别
+     * @param {*} row 需要编辑的标签
+     * @return {*}
+     */
+    handleEdit(row) {
+      this.$prompt("请输入标签名称", "编辑", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        inputValue: row.labelName,
+        inputPattern: /^[\u4e00-\u9fa5\da-zA-Z]{1,10}$/,
+        inputErrorMessage: "请输入标签内容且不能包含特殊字符并不超过10个字符",
+      })
+        .then(async ({ value }) => {
+          let { data } = await editLabel({
+            labelName: value,
+            labelId:row.labelId
+          });
+          if (data.code === undefined) {
+            this.restParam();
+            this.getLableList();
+            this.$message({
+              type: "success",
+              message: "编辑成功",
             });
           }
         })

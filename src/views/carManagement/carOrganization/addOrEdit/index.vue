@@ -10,7 +10,7 @@
     >
       <div class="content">
         <div style="margin: 20px"></div>
-        <el-form label-width="80px" :model="formInline" ref="formInline" :rules="rules">
+        <el-form label-width="120px" :model="formInline" ref="formInline" :rules="rules">
                  <el-form-item label="车辆组织类型" prop="name">
                                 <el-input v-model="formInline.name"/></el-form-item>
                  <el-form-item label="车辆组织编码"  prop="code">
@@ -54,7 +54,7 @@ export default {
     //打开模态框
     show(data){
         if (data) {
-          this.title = '修改'
+          this.title = '编辑'
         } else {
           this.title = '新增'
         }
@@ -69,7 +69,7 @@ export default {
                 let params = {
                     ...this.formInline,
                     parentCode:0,
-                    id:0
+                    id:this.title === '新增'?0:this.formInline.id
                 }
                 let res = ''
                 if (this.title === '新增') {

@@ -13,11 +13,9 @@
           style="width: 200px; margin-right: 24px"
           v-model="formParam.name"
           clearable
-          size="mini"
           placeholder="请输入指标名称"
         ></el-input>
         <el-select
-          size="mini"
           clearable
           placeholder="请选择状态"
           v-model="formParam.status"
@@ -32,17 +30,15 @@
         <el-button
           style="margin: 0 10px"
           type="primary"
-          size="mini"
-          plain
           @click="handleSearch"
           >搜索</el-button
         >
       </aside>
       <aside class="btns">
-        <el-button type="primary" size="mini" plain @click="handleAdd"
+        <el-button type="primary" @click="handleAdd"
           >新增</el-button
         >
-        <el-button type="primary" size="mini" plain @click="exportTable">导出</el-button>
+        <el-button type="primary" @click="exportTable">导出</el-button>
       </aside>
 
       <v-table
@@ -50,10 +46,12 @@
         :loading="loading"
         :table-data="tableData"
         :column-data="columnData"
-        :current.sync="listQuery.page"
+        :current.sync="listQuery.current"
+        :size.sync="listQuery.size"
         :total-count="total"
         :show-pagination="true"
         :auto-query-first="false"
+        @query-data="getExpressList"
       >
         <el-table-column
           slot="column5"
@@ -87,16 +85,15 @@
           fixed="right"
         >
           <template slot-scope="scope">
-            <el-button size="mini" type="text" @click="handleUpdate(scope.row)"
+            <el-button type="text" @click="handleUpdate(scope.row)"
               >编辑</el-button
             >
             <el-button
-              size="mini"
               type="text"
               @click="toggleStatus(scope.row)"
               >{{ scope.row.status === "normal" ? "禁用" : "启用" }}</el-button
             >
-            <el-button size="mini" type="text" @click="handleDelete(scope.row)"
+            <el-button type="text" style="color: #EB4F1A" @click="handleDelete(scope.row)"
               >删除</el-button
             >
           </template>
@@ -128,7 +125,7 @@
           :width="row.width"
         >
           <template slot-scope="scoped">
-            <el-button type="text">{{ scoped.row.name }}</el-button>
+            <el-button type="text" @click="pageToDetail(scoped.row.id)">{{ scoped.row.name }}</el-button>
           </template>
         </el-table-column>
       </v-table>
@@ -222,7 +219,7 @@ export default {
         status: "",
       },
       listQuery: {
-        page: 1,
+        current: 1,
         size: 10,
       },
 
@@ -252,6 +249,15 @@ export default {
   },
   methods: {
     /**
+     * @description: 跳转详情
+     * @param {*}
+     */
+    pageToDetail(id) {
+      this.$router.push({
+        path: `/model-detail/${id}`,
+      });
+    },
+    /**
      * @description: 获取状态下拉数据
      * @param {*}
      */
@@ -276,7 +282,7 @@ export default {
      * @param {*}
      */
     handleUpdate(row) {
-      this.dialogTitle = "修改";
+      this.dialogTitle = "编辑";
       this.isAddDialogShow = true;
       this.updateId = row.indexId;
     },
@@ -305,7 +311,7 @@ export default {
     restParam() {
       this.tableData = [];
       this.listQuery = {
-        page: 1,
+        current: 1,
         size: 10,
       };
     },
@@ -318,7 +324,7 @@ export default {
       this.loading = true;
       let param = Object.assign({}, this.formParam, this.listQuery);
 
-      param.page--;
+      param.current--;
       try {
         let { data } = await getExpressList(param);
         if (data.code == undefined) {
@@ -378,7 +384,7 @@ export default {
      */
     configExpress(row) {
       this.$router.push({
-        path: `/express-config/${row.indexId}`,
+        path: `/express-config/${row.indexId}/1`,
       });
     },
     /**

@@ -15,7 +15,6 @@
                           <el-button @click="onSubmit">新增</el-button></el-col></el-row></el-form>
         <tableCom :table-data="tableData"
                   :column-data="tbColumnCon"
-                  style="width: 40%"
                   :current.sync="pagination.current"
                   :size.sync="pagination.size"
                   :total-count="pagination.totalCount"

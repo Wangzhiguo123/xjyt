@@ -8,10 +8,11 @@
       :modal-append-to-body="false"
     >
       <div class="content">
-        是否删除id{{delData.id}}的数据
+        <!-- id{{delData.id}}的 -->
+        <i class="el-icon-warning ico"></i>是否删除此数据
       </div>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="centerDialogVisible = false">取 消</el-button>
+        <el-button @click="hide">取 消</el-button>
         <el-button type="primary" @click="confirm"
           >确 定</el-button
         >
@@ -34,6 +35,9 @@ export default {
       this.delModalVisible = true;
       this.delData = data;
     },
+    hide(data) {
+      this.delModalVisible = false;
+    },
     confirm() {
       this.$emit('confirm',this.delData);
        this.delModalVisible = false;
@@ -48,11 +52,16 @@ export default {
   .content {
     display: flex;
     align-items: center;
+    font-size: 18px;
     p {
       margin-right: 20px;
       color: #555555;
       font-size: 16px;
     }
+  }
+  .ico{
+    color: #E6A23C;
+    margin-bottom: 2px;
   }
 }
 /deep/ .el-dialog__header {
@@ -62,6 +71,6 @@ export default {
   }
 }
 /deep/ .el-dialog__body {
-  min-height: 200px;
+  // min-height: 200px;
 }
 </style>

@@ -30,6 +30,38 @@ export const proColumnCon = [
         title: "操作",
       },
 ]
+//视频监控报警表头信息
+export const videoColumnCon = [
+    {
+        field: "id",
+        title: "序号",
+        width: "70",
+      },
+      {
+        field: "organArea",
+        title: "所属区域",
+        width: "100",
+      },
+      {
+        field: "monitoryPoint",
+        title: "监控点",
+        width: "100",
+      },
+      // {
+      //   field: "location",
+      //   title: "位置",
+      //   width: "80",
+      // },
+      {
+        field: "datetime",
+        title: "最新告警时间",
+        width: "100",
+      },
+      {
+        field: "",
+        title: "操作",
+      },
+]
 //车辆监控报警表头信息
 export const carColumnCon = [
     {

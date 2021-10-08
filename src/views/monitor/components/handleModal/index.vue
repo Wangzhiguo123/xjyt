@@ -17,8 +17,29 @@
         </header>
       </template>
       <h3>告警处理</h3>
-      <el-form :model="ruleForm" status-icon ref="ruleForm" class="form" label-width="100px">
+      <el-form
+        :model="ruleForm"
+        status-icon
+        ref="ruleForm"
+        class="form"
+        label-width="100px"
+      >
         <el-form-item label="报警处理">
+          <el-select
+            v-model="ruleForm.handleType"
+            style="width: 320px"
+            placeholder="请选择活动区域"
+            @change="handleDataChange"
+          >
+            <el-option
+              v-for="(item, index) in handleData"
+              :key="index"
+              :label="item.name"
+              :value="item.code"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="指派人员" v-if="ident === 'video' && isAssign">
           <el-select
             v-model="ruleForm.handleType"
             style="width: 320px"
@@ -45,7 +66,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm('formInline')"
-          >关闭告警</el-button
+          >处理</el-button
         >
       </div>
     </el-dialog>
@@ -53,49 +74,85 @@
 </template>
 
 <script>
-import { processingStatusPage } from "@/api/modules/productionMonitoring";
+import {
+  processingStatusPage,
+  handlesTypesPage,
+  handleConfigsPage
+} from "@/api/modules/productionMonitoring";
 export default {
   data() {
     return {
       handleModalVisible: false,
-      alertId: "", //列表的id
       ruleForm: {
         handleType: "",
         remarks: "", //备注
       },
       handleData: [], //处理下拉框数据
       imgUrl: require("@/assets/images/address.png"),
+      ident: "",
+      isAssign:false,//是否指派人员
+      tranData:{},//传输数据
     };
   },
   methods: {
     //展示
-    show(data) {
-      this.alertId = data.id;
+    show(data, ident) {
+      this.tranData = data;
       this.handleModalVisible = true;
-      this.queryList();
+      this.ruleForm = {
+         handleType: "",
+        remarks: "",
+      }
+      this.queryList(ident);
+    },
+    //类型改变
+    handleDataChange(value){
+      if (this.ident === "video") {
+        this.handleData.forEach(item=>{
+          if (item.code === value){
+              this.isAssign = item.isAssign === 1?true:false;
+          }
+        })
+      }
     },
     //查询
-    async queryList() {
+    async queryList(ident) {
+      this.ident = ident;
       let params = {
         current: 0,
         size: 10,
       };
-      let res = await processingStatusPage(params);
-      this.handleData = res.data.content || [];
+      if (ident === "pro") {
+        let res = await processingStatusPage(params);
+        this.handleData = res.data.content || [];
+      }
+      if (ident === "car") {
+        let res = await handlesTypesPage(params);
+        this.handleData = res.data || [];
+      }
+      if (ident === "video") {
+        let res = await handleConfigsPage(params);
+        this.handleData = res.data.content || [];
+        this.handleData.forEach(item => {
+            item.code = item.id;
+            item.name = item.descriptions;
+        });
+      }
     },
     submitForm() {
       if (!this.ruleForm.handleType) {
         this.$message.error("请选择报警处理");
         return;
       }
-
+      console.log('this.tranData',this.tranData)
       let data = {
         code: this.handleData[0].id,
-        alertId: this.alertId,
+        alertId: this.tranData.id,
         handleType: this.ruleForm.handleType,
         remarks: this.ruleForm.remarks,
+        name:this.tranData.monitoryPoint||'', 
       };
-      this.$emit("confirm", data);
+      this.$emit("confirm", data,this.ident);
       this.handleModalVisible = false;
     },
   },
@@ -128,9 +185,9 @@ export default {
     }
   }
 }
-.form{
- border:1px solid #ccc;
- padding: 50px;
+.form {
+  border: 1px solid #ccc;
+  padding: 50px;
 }
 /deep/ .el-dialog__header {
   background: #f7f9fc;
@@ -141,10 +198,10 @@ export default {
 /deep/ .el-dialog__body {
   min-height: 200px;
   padding: 0;
-  h3{
+  h3 {
     margin: 18px 22px;
     font-size: 18px;
-    color:#000000;
+    color: #000000;
   }
 }
 </style>

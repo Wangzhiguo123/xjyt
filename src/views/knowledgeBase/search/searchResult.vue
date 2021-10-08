@@ -25,6 +25,23 @@
       <section class="items" v-for="it in searchList" :key="it.articleId">
         <search-item :result="it"></search-item>
       </section>
+      <section>
+      <!-- <div class="pagination" v-if="showPagination && tableData.length > 0">
+        <el-pagination
+          style="margin-top: 30px"
+          :current-page="current"
+          :layout="pageLayout.pageLayout"
+          background
+          :page-size="size"
+          :total="totalCount"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          prev-text="上一页"
+          next-text="下一页"
+        >
+        </el-pagination>
+      </div> -->
+    </section>
     </main>
   </div>
 </template>
@@ -79,10 +96,10 @@ export default {
     this.getAllClassifyList();
     this.urlParams = getQueryString();
     this.initData();
-    window.addEventListener("scroll", this.listScroll, true);
+    // window.addEventListener("scroll", this.listScroll, true);
   },
   destroyed() {
-    window.removeEventListener("scroll", this.listScroll, true);
+    // window.removeEventListener("scroll", this.listScroll, true);
   },
   methods: {
     /**
@@ -166,15 +183,15 @@ export default {
      * @param {*}
      * @return {*}
      */
-    listScroll(e) {
-      let target = e.target;
-      if (target.scrollHeight - 50 < target.scrollTop + target.offsetHeight) {
-        if (this.currentPage < this.totalPages) {
-          ++this.currentPage;
-          this.getSearchList();
-        }
-      }
-    },
+    // listScroll(e) {
+    //   let target = e.target;
+    //   if (target.scrollHeight - 50 < target.scrollTop + target.offsetHeight) {
+    //     if (this.currentPage < this.totalPages) {
+    //       ++this.currentPage;
+    //       this.getSearchList();
+    //     }
+    //   }
+    // },
   },
 };
 </script>

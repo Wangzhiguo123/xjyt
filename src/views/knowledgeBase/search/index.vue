@@ -4,7 +4,7 @@
  * @Autor: hh
  * @Date: 2021-08-19 10:41:30
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-09-07 17:33:25
+ * @LastEditTime: 2021-09-10 09:49:24
 -->
 <template>
   <div class="search-wrap">
@@ -119,8 +119,9 @@ export default {
   display: flex;
   flex-flow: row nowrap;
   justify-content: center;
-  align-items: center;
+  padding-top: 30vh;
   height: 100%;
+  box-sizing: border-box;
   .search-main {
     min-width: 50%;
   }

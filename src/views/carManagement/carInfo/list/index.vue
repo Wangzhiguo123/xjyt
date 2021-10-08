@@ -3,13 +3,13 @@
   <div class="productionWarning">
        <el-form :model="formInline" class="form">
                 <el-row> <el-col :span="4">
-                         <el-form-item label="报警信息">
+                         <el-form-item label="车牌号">
                          <el-input v-model="formInline.paramName"
                                    style="width: 160px"/></el-form-item></el-col>
                          <el-col :span="7"> 
-                                 <el-form-item label="服务到期时间">
+                                 <el-form-item label="服务时间">
                                  <el-date-picker
-                                      style="width: 280px"
+                                      style="width: 320px"
                                       v-model="formInline.alterTime"
                                       format="yyyy-MM-dd HH:mm:ss"
                                       type="daterange"
@@ -17,21 +17,22 @@
                                       start-placeholder="开始日期"
                                       end-placeholder="结束日期"></el-date-picker> </el-form-item></el-col>
                         <el-col :span="4">
-                                <el-form-item label="报警类型">
+                                <el-form-item label="车辆类型">
                                 <el-select v-model="formInline.type" style="width: 160px">
                                           <el-option label="区域一" value="shanghai"></el-option>
                                           <el-option label="区域二" value="beijing"></el-option></el-select></el-form-item></el-col>
                         <el-col :span="4">
-                                <el-form-item label="处理状态">
-                                <el-select v-model="formInline.status" style="width: 160px">
+                                <el-form-item label="车辆颜色">
+                                <el-select v-model="formInline.licensePlateColor " style="width: 160px">
                                           <el-option label="区域一" value="shanghai"></el-option>
                                           <el-option label="区域二" value="beijing"></el-option></el-select></el-form-item></el-col>
                         <el-col :span="4">
                           <el-button type="primary" @click="queryList">搜索</el-button>
                           <el-button type="primary" @click="queryList">重置</el-button></el-col></el-row>
                 <el-row>  <el-col :span="2">
-                          <el-button type="primary" @click="queryList">新增</el-button></el-col>
-               <el-col :span="2">
+                          <!-- <el-button type="primary" @click="queryList">新增</el-button> -->
+                          </el-col>
+               <el-col :span="2" :push="1">
                            <el-upload class="upload-demo"
                                       :action="carsImport"
                                       :on-preview="handlePreview"
@@ -39,12 +40,14 @@
                                        multiple
                                       :limit="3"
                                       :on-exceed="handleExceed"
-                                      :file-list="fileList">
+                                      :file-list="fileList"
+                                      :on-remove="handleRemove"
+                                      accept=".xls,.xlsx"
+                                      >
                                       <el-button size="small" type="primary">导入</el-button></el-upload>
                                       </el-col> </el-row></el-form>
         <tableCom :table-data="tableData"
                   :column-data="tbColumnCon"
-                  style="width: 80%"
                   :current.sync="pagination.current"
                   :size.sync="pagination.size"
                   :total-count="pagination.totalCount"
@@ -74,12 +77,14 @@
 <script>
 import tableCom from "@/components/tableCom";
 import moment from "moment";
+// carsImport
 import { carInfoPage } from "@/api/modules/carManagement";
 import importFile from "@/api/modules/importFile";
 // import { productionAlerts,handleResults } from "@/api/modules/carManagement";
 // import handleModal from "../../../components/handleModal.vue";
 // import relationModal from "../../../components/relationModal.vue";
 import { tbColumnCon } from "./config";
+import axios from "axios";
 export default {
   name: "ProductionWarning",
   components: {
@@ -94,7 +99,7 @@ export default {
         paramName: "",
         alterTime: "",
         type: "",
-        status: "",
+        licensePlateColor : "",
       },
       fileList: [],//上传文件
       carsImport: importFile.carsImport,
@@ -142,6 +147,10 @@ export default {
         console.log('this.tableData',res.errorList)
         // this.tableData = res.errorList;
       },
+    //删除上传文件
+    handleRemove(file, fileList) {
+        console.log(file, fileList);
+    },
     //查询列表
     async queryList() {
       let params = {
@@ -150,22 +159,22 @@ export default {
         size: this.pagination.size,
         carPageDTO:{}
       };
-      // if (params.alterTime) {
-      //   params.alertStartTime = moment(params.alterTime[0]).format(
-      //     "YYYY-MM-DD HH:mm:ss"
-      //   );
-      //   params.alertEndTime = moment(params.alterTime[1]).format(
-      //     "YYYY-MM-DD HH:mm:ss"
-      //   );
-      // } else {
-      //   params.alertStartTime = "";
-      //   params.alertEndTime = "";
-      // }
+      if (params.alterTime) {
+        params.serviceStartTime  = moment(params.alterTime[0]).format(
+          "YYYY-MM-DD HH:mm:ss"
+        );
+        params.serviceEndTime  = moment(params.alterTime[1]).format(
+          "YYYY-MM-DD HH:mm:ss"
+        );
+      } else {
+        params.serviceStartTime  = "";
+        params.serviceEndTime = "";
+      }
       console.log('params',params)
       let res = await carInfoPage(params);
       console.log('res',res)
       this.tableData = res.data.content || [];
-      this.pagination.totalCount = Number(res.data.totalElements);
+      this.pagination.totalCount = Number(res.data.totalElements) || 0;
     }
 
   },
@@ -175,8 +184,8 @@ export default {
 <style lang="less" scoped>
 .productionWarning {
   min-width: calc(100vh - 300px);
-  min-width: 1440px;
   padding-left: 30px;
+  padding-right: 30px;
   .form {
     padding-top: 30px;
   }
@@ -192,7 +201,7 @@ export default {
   .el-button--primary{
     width: 66px;
     height: 40px;
-    margin-left: -20px;
+    margin-left: -60px;
   }
 }
 </style>

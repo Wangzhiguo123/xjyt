@@ -54,7 +54,7 @@ export default {
     //打开模态框
     show(data){
         if (data) {
-          this.title = '修改'
+          this.title = '编辑'
         } else {
           this.title = '新增'
         }

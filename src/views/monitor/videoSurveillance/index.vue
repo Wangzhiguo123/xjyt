@@ -1,21 +1,24 @@
 <!-- 视频监控告警管理 -->
 <template>
-  <div>
-    <div>视频监控告警管理</div>
+  <div class="videoSurveillance">
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
 export default {
-  name: "VideoSurveillance",
-  components: {
-  },
+  name: "videoSurveillanceIndex",
   data() {
-    return {
-    };
+    return {};
   },
+  mounted() {},
+  methods: {},
 };
 </script>
-
 <style lang="less" scoped>
+.videoSurveillance {
+  height: 100%;
+  max-width: 100%;
+  
+}
 </style>

@@ -15,7 +15,6 @@
                           <el-button @click="onSubmit">新增</el-button></el-col></el-row></el-form>
         <tableCom :table-data="tableData"
                   :column-data="tbColumnCon"
-                  style="width: 50%"
                   :current.sync="pagination.current"
                   :size.sync="pagination.size"
                   :total-count="pagination.totalCount"
@@ -112,7 +111,7 @@ export default {
       };
       let res = await carOperationStatussPage(params);
       this.tableData = res.data.content || [];
-      this.pagination.totalCount = Number(res.data.totalElements);
+      this.pagination.totalCount = Number(res.data.totalElements) || 0;
     }
   },
 };
@@ -121,8 +120,8 @@ export default {
 <style lang="less" scoped>
 .carOperationStatuss {
   min-width: calc(100vh - 300px);
-  min-width: 1440px;
   padding-left: 30px;
+  padding-right: 30px;
   .form {
     padding-top: 30px;
   }

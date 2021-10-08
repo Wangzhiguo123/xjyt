@@ -31,18 +31,18 @@
 <template>
   <div class="tableCom">
     <el-table
-      v-loading="loading"
       :ref="_ref"
+      v-loading="loading"
       :data="tableData"
       :border="border"
       :row-key="getKeys"
       class="table"
       :sortable="true"
-      @selection-change="handleSelectionChange"
       :default-sort="defaultSort"
+      :header-cell-style="{ background: '#F7F7F8', color: 'rgba(0,0,0,0.45)' }"
+      :cell-style="{ color: 'rgba(0,0,0,0.85)' }"
+      @selection-change="handleSelectionChange"
       @sort-change="handleSortChanged"
-      :header-cell-style="{ background: '#f5f7fa', color: '#606266' }"
-      :cell-style="cellStyle"
       @row-click="handleRowClick"
     >
       <!-- 多选  -->
@@ -64,11 +64,11 @@
         >
           <!--普通列-->
           <el-table-column
+            :key="index"
             :sortable="sortable"
             :label="item.title"
             :prop="item.field"
             show-overflow-tooltip
-            :key="index"
             :width="item.width"
             :fixed="item.fixed"
             :min-width="getColumnMinWidth(item)"
@@ -78,18 +78,16 @@
       </template>
     </el-table>
     <section>
-      <div class="pagination" v-if="showPagination && tableData.length > 0">
+      <div v-if="showPagination && tableData.length > 0" class="pagination">
         <el-pagination
+          background
           style="margin-top: 30px"
           :current-page="current"
-          :layout="pageLayout.pageLayout"
-          background
           :page-size="size"
           :total="totalCount"
+          layout="total, prev, pager, next, sizes, jumper"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
-          prev-text="上一页"
-          next-text="下一页"
         >
         </el-pagination>
       </div>
@@ -100,8 +98,8 @@
 <script>
 export default {
   props: {
-    "_ref":{
-      type: String
+    _ref: {
+      type: String,
     },
     //表格数据
     "table-data": {
@@ -228,8 +226,8 @@ export default {
     /**
      * @description: 清空选择
      * @param {*}
-     */    
-    clearSelection(){
+     */
+    clearSelection() {
       this.$refs[this._ref].clearSelection();
     },
     /**
@@ -248,8 +246,7 @@ export default {
      * @param size
      */
     handleSizeChange(val) {
-      this.size = val;
-      this.$emit("update:current", val);
+      this.$emit("update:size", val);
       this.queryList();
     },
     /**
@@ -287,7 +284,7 @@ export default {
     queryList() {
       this.$emit("query-data", {
         current: this.current,
-        size: this.showPagination ? this.size : this.maxSize,
+        size: this.size,
       });
     },
   },
@@ -300,8 +297,7 @@ export default {
     position: relative;
   }
   .pagination {
-    position: relative;
-    right: 0;
+    text-align: right;
   }
 }
 /deep/.el-table th.gutter {
@@ -311,25 +307,25 @@ export default {
 /deep/.el-table colgroup.gutter {
   display: table-cell !important;
 }
-/deep/ .el-pagination {
-  text-align: right;
-}
-/deep/.el-pagination span:not([class*="suffix"]) {
-  min-width: 72px;
-  // border: 1px solid #b5bdcc;
-  // border-radius: 4px;
-  // .btn-next,.btn-prev,
-}
-/deep/.el-pager li {
-  color: #b5bdcc !important;
-  border: 1px solid #b5bdcc;
-  border-radius: 4px !important;
-}
-/deep/.el-pager li.active + li {
-  border-left: 1px solid #b5bdcc;
-}
-/deep/.el-pager li:not(.disabled).active {
-  border: none;
-  color: #fff !important;
-}
+/*/deep/ .el-pagination {*/
+/*  text-align: right;*/
+/*}*/
+/*/deep/.el-pagination span:not([class*="suffix"]) {*/
+/*  min-width: 72px;*/
+/*  // border: 1px solid #b5bdcc;*/
+/*  // border-radius: 4px;*/
+/*  // .btn-next,.btn-prev,*/
+/*}*/
+/*/deep/.el-pager li {*/
+/*  color: #b5bdcc !important;*/
+/*  border: 1px solid #b5bdcc;*/
+/*  border-radius: 4px !important;*/
+/*}*/
+/*/deep/.el-pager li.active + li {*/
+/*  border-left: 1px solid #b5bdcc;*/
+/*}*/
+/*/deep/.el-pager li:not(.disabled).active {*/
+/*  border: none;*/
+/*  color: #fff !important;*/
+/*}*/
 </style>

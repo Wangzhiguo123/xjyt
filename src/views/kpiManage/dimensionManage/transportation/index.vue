@@ -1,16 +1,16 @@
 <!--
  * @Description: 集输关系维度
  * @Date: 2021-08-31 15:10:20
- * @LastEditTime: 2021-09-01 16:52:02
+ * @LastEditTime: 2021-09-15 16:49:15
 -->
 <template>
   <div class="container">
+    <el-button type="primary" v-if="hasShowInit" size="mini" @click="addInit">初始化集输关系维度</el-button>
     <el-table
       :data="tableData"
-      style="width: 300px; margin-top: 20px"
+      style="width: 300px;"
       default-expand-all
       row-key="id"
-      border
       :tree-props="{ children: 'children' }"
       @row-contextmenu="contextmenuClick"
     >
@@ -41,7 +41,7 @@ export default {
       // 列表数据
       tableData: [],
       rowTarget: null,
-
+      hasShowInit:false,
       // 鼠标对象
       eventTarget: null,
       isContextShow: false,
@@ -49,12 +49,27 @@ export default {
   },
   methods: {
     /**
+     * @description: 初始化节点
+     * @param {*}
+     */
+    addInit(){
+      this.rowTarget={
+        parentId:""
+      };
+      this.addPoint({ key:"sibling", label: "初始化集输关系维度"});
+    },
+    /**
      * @description: 获取场景列表
      * @param {*}
      */
     async getTransportList() {
       let { data } = await getTransportList();
       if (data.code === undefined) {
+        if(data.length==0){
+          this.hasShowInit=true;
+        }else{
+          this.hasShowInit=false;
+        }
         this.tableData = [...data];
       }
     },
@@ -77,13 +92,10 @@ export default {
     contextClick(row) {
       switch (row.key) {
         case "append":
-          this.addPoint(row.value);
+          this.addPoint({...row});
           break;
-        case "prev":
-          this.addPoint(row.value);
-          break;
-        case "next":
-          this.addPoint(row.value);
+        case "sibling":
+          this.addPoint({...row});
           break;
         case "update":
           this.updatePoint();
@@ -95,10 +107,10 @@ export default {
     },
     /**
      * @description: 添加节点
-     * @param {*} msg 提示信息
+     * @param {*} label 提示信息
      */
-    addPoint(msg) {
-      this.$prompt("请输入维度名称", "提示", {
+    addPoint({ key, label }) {
+      this.$prompt("请输入维度名称", "添加节点", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         inputPattern: /^[\u4e00-\u9fa5\da-zA-Z-]{0,20}$/,
@@ -107,25 +119,28 @@ export default {
         .then(async ({ value }) => {
           let { data } = await addTransport({
             name: value,
-            parentId: this.rowTarget.parentId,
+            parentId:
+              key === "append" ? this.rowTarget.id : this.rowTarget.parentId,
           });
           if (data.code == undefined) {
             this.getTransportList();
             this.$message({
               type: "success",
-              message: `${msg}成功`,
+              message: `${label}成功`,
             });
             this.isContextShow = false;
           }
         })
-        .catch(() => {});
+        .catch(() => {
+          this.isContextShow = false;
+        });
     },
     /**
      * @description: 修改节点
      * @param {*}
      */
     updatePoint() {
-      this.$prompt("请修改维度名称", "提示", {
+      this.$prompt("请修改维度名称", "修改节点", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         inputValue: this.rowTarget.label,
@@ -135,8 +150,8 @@ export default {
         .then(async ({ value }) => {
           let { data } = await updateTransport({
             name: value,
-            parentId: this.rowTarget.parentId,
-            geologyId: this.rowTarget.id,
+            id: this.rowTarget.id,
+            gatheringId: this.rowTarget.id,
           });
           if (data.code == undefined) {
             this.getTransportList();
@@ -147,7 +162,9 @@ export default {
             this.isContextShow = false;
           }
         })
-        .catch(() => {});
+        .catch(() => {
+          this.isContextShow = false;
+        });
     },
     /**
      * @description: s删除节点
@@ -168,6 +185,8 @@ export default {
             message: "删除成功",
           });
         }
+      }).catch(() => {
+          this.isContextShow = false;
       });
     },
   },
@@ -176,4 +195,8 @@ export default {
   },
 };
 </script>
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+  .container {
+    padding: 40px;
+  }
+</style>

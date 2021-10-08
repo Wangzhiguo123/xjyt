@@ -77,6 +77,9 @@
           :width="row.width"
         >
           <template slot-scope="scope">
+            <el-button size="mini" type="text" @click="handleEdit(scope.row)"
+              >编辑</el-button
+            >
             <el-button
               size="mini"
               type="text"
@@ -98,6 +101,7 @@ import {
   getClassifyList,
   delClassifies,
   addClassify,
+  editClassify
 } from "@/api/modules/knowledgeBase";
 export default {
   components: {
@@ -178,7 +182,7 @@ export default {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         inputPattern: /^[\u4e00-\u9fa5\da-zA-Z]{1,10}$/,
-        inputErrorMessage: "请输入类别名称且不能包含特殊字符",
+        inputErrorMessage: "请输入类别名称且不能包含特殊字符并不超过10个字符",
       })
         .then(async ({ value }) => {
           let { data } = await addClassify({
@@ -263,6 +267,35 @@ export default {
         return;
       }
       this.handleDelete(this.classifyIds);
+    },
+    /**
+     * @description: 编辑单独类别
+     * @param {*} row 需要编辑的类别
+     * @return {*}
+     */
+    handleEdit(row) {
+      this.$prompt("请输入类别名称", "编辑", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        inputValue: row.classificationName,
+        inputPattern: /^[\u4e00-\u9fa5\da-zA-Z]{1,10}$/,
+        inputErrorMessage: "请输入类别名称且不能包含特殊字符并不超过10个字符",
+      })
+        .then(async ({ value }) => {
+          let { data } = await editClassify({
+            classificationName: value,
+            classificationId:row.classificationId
+          });
+          if (data.code === undefined) {
+            this.restParam();
+            this.getClassifyList();
+            this.$message({
+              type: "success",
+              message: "编辑成功",
+            });
+          }
+        })
+        .catch(() => {});
     },
     /**
      * @description: 删除单独类别

@@ -69,6 +69,9 @@
           <el-select
             size="mini"
             clearable
+            multiple
+            :multiple-limit="1"
+            collapse-tags
             v-model="formParams.articleState"
             placeholder="请选择"
           >
@@ -105,7 +108,7 @@
         </el-form-item>
 
         <el-form-item>
-          <el-button size="mini" type="primary" @click="getKnowledgeBaseList"
+          <el-button size="mini" type="primary" @click="searchResult"
             >查询</el-button
           >
         </el-form-item>
@@ -352,6 +355,27 @@ export default {
   },
   methods: {
     /**
+     * @description: 搜索确定
+     * @param {*}
+     * @return {*}
+     */
+    searchResult() {
+      this.restParam();
+      this.getKnowledgeBaseList();
+    },
+     /**
+     * @description: 重置参数
+     * @param {*}
+     * @return {*}
+     */
+    restParam() {
+      this.tableData = [];
+      this.listQuery = {
+        page: 1,
+        size: 10,
+      };
+    },
+    /**
      * @description: 获取作者下拉
      * @param {*}
      */
@@ -442,6 +466,8 @@ export default {
         publishDateEnd: "",
         title: "",
       };
+      this.restParam();
+      this.getKnowledgeBaseList();
     },
     /**
      * @description: 行点击事件

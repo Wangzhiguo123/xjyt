@@ -1,41 +1,38 @@
 export const tbColumnCon = [
     {
+      title: "编号",
+      field: "code",
+    },
+    {
       title: "车牌号码",
       field: "licensePlateNumber",
-      width: 120,
     },
     {
-      title: "告警类型",
-      field: "type",
-      width: 120,
+      title: "运营类型",
+      field: "carOperationName",
     },
     {
-      title: "车辆运营",
-      field: "operationRoute",
-      width: 120,
+      title: "告警分类",
+      field: "typeName",
     },
     {
-      title: "报警开始时间",
-      field: "startTime",
-      width: 200,
-    },
-    {
-      title: "报警结束时间",
-      field: "endTime",
-      width: 200,
+      title: "告警时间",
+      field: "alertTime",
     },
     {
       title: "车辆状态",
-      field: "carStatus",
-      width: 200,
+      field: "carStatusName",
     },
     {
-      title: "处理状态",
-      field: "status ",
-      width: 120,
+      title: "位置信息",
+      field: "location",
+    },
+    {
+      title: "状态",
+      field: "statusName",
     },
     {
       title: "操作",
-      field: "alertLevel"
-    }
+      fixed:"right"
+    },
   ]

@@ -15,7 +15,7 @@ const apiList = [
     key: "/api",
     env: {
       development: "/api",
-      test: "",
+      test: "http://pss-system-test.cddev.cddpi.com",
       devcater: "http://pss-knowledge.cddev.cddpi.com",
       production: "http://pss-knowledge.cddev.cddpi.com",
     }[process.env.NODE_ENV],
@@ -48,12 +48,12 @@ const apiList = [
     }[process.env.NODE_ENV],
   },
   {
-    key: "/paramAlerts",
+    key: "/paramAlerts",//生产告警
     env: {
       development: "/paramAlerts",
-      test: "",
-      devcater: "http://pss-knowledge.cddev.cddpi.com",
-      production: "http://pss-knowledge.cddev.cddpi.com",
+      test: "http://pss-system-test.cddev.cddpi.com",
+      devcater: "http://pss-monitor-production.cddev.cddpi.com",
+      production: "http://pss-monitor-production.cddev.cddpi.com",
     }[process.env.NODE_ENV],
   },
   {
@@ -61,16 +61,16 @@ const apiList = [
     env: {
       development: "/bese",
       test: "",
-      devcater: "http://pss-knowledge.cddev.cddpi.com",
-      production: "http://pss-knowledge.cddev.cddpi.com",
+      devcater: "http://pss-base.cddev.cddpi.com",
+      production: "http://pss-base.cddev.cddpi.com",
     }[process.env.NODE_ENV],
   },
   {
     key: "/passkpi",
     env: {
       development: "/passkpi",
-      test: "",
-      devcater: "http://pss-knowledge.cddev.cddpi.com",
+      test: "http://pss-kpi-test.cddev.cddpi.com",
+      devcater: "http://pss-kpi.cddev.cddpi.com",
       production: "http://pss-knowledge.cddev.cddpi.com",
     }[process.env.NODE_ENV],
   },
@@ -102,21 +102,30 @@ const apiList = [
     }[process.env.NODE_ENV],
   },
   {
-    key: "/vehicle",
+    key: "/vehicle",//车辆管理
     env: {
       development: "/vehicle",
-      test: "",
-      devcater: "http://pss-knowledge.cddev.cddpi.com",
-      production: "http://pss-knowledge.cddev.cddpi.com",
+      test: "http://pss-system-test.cddev.cddpi.com",
+      devcater: "http://pss-base.cddev.cddpi.com",
+      production: "http://pss-base.cddev.cddpi.com",
     }[process.env.NODE_ENV],
   },
   {
     key: "/carWarning",
     env: {
       development: "/carWarning",
-      test: "",
-      devcater: "http://pss-knowledge.cddev.cddpi.com",
-      production: "http://pss-knowledge.cddev.cddpi.com",
+      test: "http://pss-system-test.cddev.cddpi.com",
+      devcater: "http://pss-monitor-car.cddev.cddpi.com",
+      production: "http://pss-monitor-car.cddev.cddpi.com",
+    }[process.env.NODE_ENV],
+  },
+  {
+    key: "/video",
+    env: {
+      development: "/video",
+      test: "http://pss-system-test.cddev.cddpi.com",
+      devcater: "http://pss-monitor-video.cddev.cddpi.com",
+      production: "http://pss-monitor-video.cddev.cddpi.com",
     }[process.env.NODE_ENV],
   },
   {

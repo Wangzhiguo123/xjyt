@@ -464,6 +464,17 @@ export default {
      * @param {*} list
      */
     fileChange(file) {
+      const isLt500M = file.size / 1024 / 1024 < 500;
+      if (!isLt500M) {
+        this.$message.error('上传文件大小不能超过500MB!');
+        return;
+      }
+      //上传文件不能超过15个以及总大小不能超过500M
+      if(fileList.length>=15){
+         this.$message.error('上传的文件总数不能超过15个!');
+        return;
+      }
+
       this.fileList.push({
         attachmentId: "",
         attachmentSizeAssemble: formatSizeUnits(file.size),

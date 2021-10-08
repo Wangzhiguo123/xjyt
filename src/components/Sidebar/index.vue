@@ -35,10 +35,11 @@
 
 <script>
 import SidebarItem from "./SidebarItem";
-
+import { mapState } from "vuex";
 export default {
   components: { SidebarItem },
   computed: {
+     ...mapState("baseStore", ["themeColor"]),
     // 当前所有路由
     routes() {
       return this.$router.options.routes;
@@ -47,6 +48,7 @@ export default {
     activeMenu() {
       const route = this.$route;
       const { meta, path } = route;
+      console.log('themeColor',this.themeColor)
       if (meta.activeMenu) {
         return meta.activeMenu;
       }
@@ -99,4 +101,10 @@ export default {
     }
   }
 }
+// /deep/.el-menu-item:hover {
+//   background: red !important;
+// }
+// /deep/.el-menu-item.is-active {
+//   background:red !important;
+// }
 </style>

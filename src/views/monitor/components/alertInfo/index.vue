@@ -20,7 +20,7 @@
       </header>
     </template> -->
   <div class="mapTabs" v-show="exhibition">
-    <header class="title">
+    <!-- <header class="title">
       <div class="text">
         <img :src="imgUrl" alt="" />
         <span class="oneClass">采气一厂</span>/
@@ -29,10 +29,10 @@
       <div class="font" @click="hide">
         <i class="el-icon-close"></i>
       </div>
-    </header>
+    </header> -->
     <ul class="head">
       <li :class="active === 1 ? 'activePlantArea' : ''" @click="changeInfo(1)">
-        基础信息
+        告警信息
       </li>
       <li :class="active === 2 ? 'activePlantArea' : ''" @click="changeInfo(2)">
         监控画面
@@ -44,7 +44,7 @@
         <span>{{ item.value }}</span>
       </li>
     </ul>
-    <ul v-show="active === 1" class="info">
+    <ul v-show="active === 1" class="bottomInfo">
       <li>
         <p>[关联工单]</p>
         <span>百口泉采油厂生产运行科电器设备（施）维修派工单</span>
@@ -78,7 +78,7 @@
         ><i class="el-icon-arrow-right"></i>去关联</el-button
       >
     </div>
-    <div class="relation">
+    <div class="relation"  v-show="active === 2">
       <el-button type="primary" @click="handleModal"
         ><i class="el-icon-arrow-right"></i>告警处理</el-button
       >
@@ -96,7 +96,7 @@
 <script>
 import { basicsInfo } from "@/api/modules/productionMonitoring";
 import camera from "../camera";
-import workOrder from "../workOrder";
+import workOrder from "../params/workOrder";
 export default {
   components: {
     camera,
@@ -223,6 +223,21 @@ export default {
   .info {
     border-top: 1px solid #ccc;
     height: 320px;
+    li {
+      display: flex;
+      justify-content: flex-start;
+      padding-top: 16px;
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.45);
+      font-size: 14px;
+      p {
+        margin-right: 81px;
+        margin-left: 34px;
+      }
+    }
+  }
+  .bottomInfo {
+    border-top: 1px solid #ccc;
     li {
       display: flex;
       justify-content: flex-start;

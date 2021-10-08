@@ -1,12 +1,17 @@
 export const tbColumnCon = [
     {
-      title: "报警区块",
+      title: "编号",
+      field: "code",
+      width: 120,
+    },
+    {
+      title: "告警区块",
       field: "alertBlock",
       width: 120,
     },
     {
-      title: "报警信息",
-      field: "alertBlock?",
+      title: "告警对象",
+      field: "linkObject",
       width: 120,
     },
     {
@@ -20,34 +25,53 @@ export const tbColumnCon = [
       width: 120,
     },
     {
-      title: "限值",
-      field: "referenceValue",
+      title: "最高限值",
+      field: "maxValue",
       width: 120,
     },
     {
-      title: "报警类型",
-      field: "type",
+      title: "最低限值",
+      field: "minValue",
       width: 120,
     },
     {
-      title: "报警等级",
-      field: "alertLevel",
+      title: "告警类型",
+      field: "alertTypeName",
       width: 120,
     },
     {
-      title: "报警时间",
+      title: "告警分类",
+      field: "alertClassifyName",
+      width: 120,
+    },
+    {
+      title: "告警等级",
+      field: "alertLevelName",
+      width: 120,
+    },
+    {
+      title: "告警时间",
       field: "alertTime",
       width: 120,
     },
     {
-      title: "报警状态",
-      field: "status",
+      title: "关联工单",
+      field: "workOrderName",
+      width: 120,
+    },
+    {
+      title: "处理人",
+      field: "",
+      width: 120,
+    },
+    {
+      title: "状态",
+      field: "statusName",
       width: 120,
     },
     {
       title: "操作",
-      field: "",
-      width: '240',
+      width: 140,
       fixed:"right"
     },
   ]

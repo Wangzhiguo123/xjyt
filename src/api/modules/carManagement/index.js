@@ -16,13 +16,17 @@ export function carInfoAdd(query){
 export function carInfoEdit(query){ 
     return request.put(`${carUrl}/${query.organizationId}/cars/update`,query)
   }
+// 详情 待测试
+export function carInfoDetails(query){
+  return request.get(`${carUrl}/${query.organizationId}/cars/update/${query.id}`)
+}  
 //删除
 export function carInfoDel(query){
     return request.deletefn(`${carUrl}/${query.organizationId}/cars/${query.id}`)
   }
 //导入
 export function carsImport(query){
-    return request.post(`${carUrl}/cars/import`)
+    return request.get(`${carUrl}/cars/import`)
   }
 /********************************车辆类型******************************************/
 //列表
